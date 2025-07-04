@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Montador de Cronograma de Aulas - Engenharias</title>
+    <title>Montador de Cronograma - Todas Engenharias</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -16,7 +16,7 @@
             transition: background-color 0.3s, color 0.3s;
         }
         .schedule-cell {
-            min-height: 80px;
+            min-height: 60px;
             transition: all 0.3s ease;
         }
         .conflict {
@@ -25,49 +25,47 @@
             border: 2px solid #b91c1c; /* red-700 */
         }
         .course-item {
-            font-size: 11px;
+            font-size: 10px;
             line-height: 1.2;
         }
-        /* Custom scrollbar for course list */
         #course-list::-webkit-scrollbar {
             width: 8px;
         }
         #course-list::-webkit-scrollbar-track {
-            background: #f1f5f9; /* slate-100 */
+            background: #f1f5f9;
         }
         #course-list::-webkit-scrollbar-thumb {
-            background-color: #94a3b8; /* slate-400 */
+            background-color: #94a3b8;
             border-radius: 10px;
-            border: 2px solid #f1f5f9; /* slate-100 */
+            border: 2px solid #f1f5f9;
         }
-        /* Dark Mode Styles */
         html.dark {
             color-scheme: dark;
         }
         html.dark body {
-            background-color: #0f172a; /* slate-900 */
-            color: #e2e8f0; /* slate-200 */
+            background-color: #0f172a;
+            color: #e2e8f0;
         }
-        html.dark .bg-white { background-color: #1e293b; /* slate-800 */ }
-        html.dark .bg-gray-100 { background-color: #0f172a; /* slate-900 */ }
-        html.dark .text-gray-900 { color: #f8fafc; /* slate-50 */ }
-        html.dark .text-gray-800 { color: #e2e8f0; /* slate-200 */ }
-        html.dark .text-gray-700 { color: #94a3b8; /* slate-400 */ }
-        html.dark .text-gray-600 { color: #64748b; /* slate-500 */ }
-        html.dark .text-gray-500 { color: #475569; /* slate-600 */ }
-        html.dark .border-b { border-color: #334155; /* slate-700 */ }
-        html.dark .border-gray-300 { border-color: #334155; /* slate-700 */ }
-        html.dark .bg-gray-50 { background-color: #334155; /* slate-700 */ }
-        html.dark .bg-gray-200 { background-color: #334155; /* slate-700 */ }
+        html.dark .bg-white { background-color: #1e293b; }
+        html.dark .bg-gray-100 { background-color: #0f172a; }
+        html.dark .text-gray-900 { color: #f8fafc; }
+        html.dark .text-gray-800 { color: #e2e8f0; }
+        html.dark .text-gray-700 { color: #94a3b8; }
+        html.dark .text-gray-600 { color: #64748b; }
+        html.dark .text-gray-500 { color: #475569; }
+        html.dark .border-b { border-color: #334155; }
+        html.dark .border-gray-300 { border-color: #334155; }
+        html.dark .bg-gray-50 { background-color: #334155; }
+        html.dark .bg-gray-200 { background-color: #334155; }
         html.dark .hover\:bg-gray-200:hover { background-color: #475569; }
         html.dark select, html.dark input {
-            background-color: #334155; /* slate-700 */
-            border-color: #475569; /* slate-600 */
-            color: #f8fafc; /* slate-50 */
+            background-color: #334155;
+            border-color: #475569;
+            color: #f8fafc;
         }
         html.dark #course-list::-webkit-scrollbar-track { background: #1e293b; }
         html.dark #course-list::-webkit-scrollbar-thumb { background-color: #475569; border-color: #1e293b; }
-        html.dark .course-item p { color: #1e293b; /* slate-800 */ }
+        html.dark .course-item p { color: #1e293b; }
         html.dark .course-item .italic { color: #334155 !important; }
     </style>
 </head>
@@ -75,8 +73,8 @@
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8 relative">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Montador de Cronograma de Aulas</h1>
-            <p class="text-gray-600 mt-2">Filtre por curso, pesquise, selecione suas disciplinas e gere seu horário personalizado.</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Montador de Cronograma Unificado</h1>
+            <p class="text-gray-600 mt-2">Filtre por curso, pesquise, selecione suas disciplinas e monte seu horário.</p>
             <button id="dark-mode-toggle" class="absolute top-0 right-0 p-2 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none">
                 <svg id="theme-toggle-dark-icon" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                 <svg id="theme-toggle-light-icon" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
@@ -84,149 +82,332 @@
         </header>
 
         <div class="flex flex-col lg:flex-row gap-8">
-
-            <!-- Painel de Seleção de Disciplinas -->
             <aside class="w-full lg:w-1/3 xl:w-1/4 bg-white p-6 rounded-2xl shadow-lg">
                 <h2 class="text-xl font-semibold mb-4 border-b pb-2">Disciplinas Disponíveis</h2>
-                
-                <!-- Filtros -->
                 <div class="space-y-4 mb-4">
                     <div>
                         <label for="department-filter" class="block text-sm font-medium text-gray-700">Filtrar por Curso:</label>
-                        <select id="department-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                            <!-- Opções de filtro serão inseridas aqui -->
-                        </select>
+                        <select id="department-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"></select>
                     </div>
                     <div>
                         <label for="search-input" class="block text-sm font-medium text-gray-700">Pesquisar Disciplina ou Professor:</label>
                         <input type="text" id="search-input" placeholder="Digite para pesquisar..." class="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
                     </div>
                 </div>
-
-                <div id="course-list" class="space-y-3 max-h-[45vh] overflow-y-auto pr-2">
-                    <!-- A lista de disciplinas será inserida aqui -->
-                </div>
+                <div id="course-list" class="space-y-3 max-h-[45vh] overflow-y-auto pr-2"></div>
                 <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                    <button id="generate-schedule" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300">
-                        Gerar Horário
-                    </button>
-                     <button id="clear-schedule" class="w-full bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300">
-                        Limpar
-                    </button>
+                    <button id="generate-schedule" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300">Gerar Horário</button>
+                    <button id="clear-schedule" class="w-full bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300">Limpar</button>
                 </div>
-                 <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button id="download-png" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300">
-                        Baixar Imagem (PNG)
-                    </button>
-                    <button id="download-pdf" class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-300">
-                        Baixar PDF
-                    </button>
+                <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button id="download-png" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300">Baixar Imagem (PNG)</button>
+                    <button id="download-pdf" class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-300">Baixar PDF</button>
                 </div>
             </aside>
 
-            <!-- Painel do Cronograma -->
             <main class="w-full lg:w-2/3 xl:w-3/4">
                 <div id="schedule-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg min-h-full">
-                     <div id="schedule-placeholder" class="text-center py-20 flex flex-col items-center justify-center h-full">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                          <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                        </svg>
+                    <div id="schedule-placeholder" class="text-center py-20 flex flex-col items-center justify-center h-full">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                         <h3 class="mt-2 text-sm font-semibold text-gray-900">Nenhum horário gerado</h3>
                         <p class="mt-1 text-sm text-gray-500">Selecione as disciplinas e clique em "Gerar Horário".</p>
-                      </div>
-                    <div id="schedule-grid" class="hidden">
-                        <!-- O cronograma será inserido aqui -->
                     </div>
+                    <div id="schedule-grid" class="hidden"></div>
+                    <div id="schedule-legend" class="mt-8"></div>
                 </div>
             </main>
         </div>
     </div>
 
     <script>
-        // Dados consolidados e completos de todos os PDFs
         const allCoursesData = [
-            // Eng. de Computação
-            { id: 'ADMT0027-C6-COMP', department: 'Eng. de Computação', name: 'ADMINISTRAÇÃO PARA ENGENHARIA', turma: 'C6', professor: 'ANGELO ANTONIO MACEDO LEITE', slots: [{ dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA VIRTUAL 5' }] },
-            { id: 'CCMP0211-X1-COMP', department: 'Eng. de Computação', name: 'ALGORITMO E PROGRAMAÇÃO PARA COMPUTAÇÃO', turma: 'X1', professor: 'ANA EMILIA DE MELO QUEIROZ', slots: [{ dia: 'SEG', horario: ['13:00-14:00', '14:00-15:00'], sala: 'LAB PROG. BÁSICA' }, { dia: 'QUA', horario: ['13:00-14:00', '14:00-15:00'], sala: 'LAB PROG. BÁSICA' }] },
-            { id: 'CCMP0210-2C-COMP', department: 'Eng. de Computação', name: 'ALGORITMOS E ESTRUTURA DE DADOS', turma: '2C', professor: 'MARCELO SANTOS LINDER', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'LAB PROG. AVANÇADA' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'LAB PROG. AVANÇADA' }] },
-            { id: 'CCMP0210-C2-COMP', department: 'Eng. de Computação', name: 'ALGORITMOS E ESTRUTURA DE DADOS', turma: 'C2', professor: 'MARCELO SANTOS LINDER', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'LAB PROG. BÁSICA' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'LAB PROG. BÁSICA' }] },
-            { id: 'CCMP0058-C8-COMP', department: 'Eng. de Computação', name: 'ASPECTOS LEGAIS PARA COMPUTAÇÃO', turma: 'C8', professor: 'NÃO INFORMADO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 13' }] },
-            { id: 'CCMP0220-C6-COMP', department: 'Eng. de Computação', name: 'BANCO DE DADOS II', turma: 'C6', professor: 'MARIO GODOY NETO', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 18' }] },
-            { id: 'MATM0123-C4-COMP', department: 'Eng. de Computação', name: 'CÁLCULO NUMÉRICO', turma: 'C4', professor: 'JORGE LUIS CAVALCANTI RAMOS', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'NT 01' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'NT 01' }] },
-            { id: 'CCMP0229-C8-COMP', department: 'Eng. de Computação', name: 'ELEMENTOS DE CRIPTOGRAFIA E SEGURANÇA', turma: 'C8', professor: 'JAIRSON BARBOSA RODRIGUES', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA VIRTUAL 3' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA VIRTUAL 3' }] },
-            { id: 'CCMP0230-C4-COMP', department: 'Eng. de Computação', name: 'ELETRÔNICA ANALÓGICA', turma: 'C4', professor: 'ANA JULIA F. DE O. BARROS', slots: [{ dia: 'TER', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 19' }, { dia: 'QUI', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 19' }] },
-            { id: 'CCMP0231-C2-COMP', department: 'Eng. de Computação', name: 'ELETRÔNICA DIGITAL', turma: 'C2', professor: 'MAX SANTANA ROLEMBERG FARIAS', slots: [{ dia: 'TER', horario: ['08:00-09:00', '09:00-10:00'], sala: 'N/A' }, { dia: 'QUI', horario: ['08:00-09:00', '09:00-10:00'], sala: 'N/A' }] },
-            { id: 'CCMP0234-C6-COMP', department: 'Eng. de Computação', name: 'ENGENHARIA DE SOFTWARE II', turma: 'C6', professor: 'RICARDO ARGENTON RAMOS', slots: [{ dia: 'SEX', horario: ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala: 'SALA 18' }] },
-            { id: 'CCMP0235-CX-COMP', department: 'Eng. de Computação', name: 'ENGENHARIA DE SOFTWARE III', turma: 'CX', professor: 'RICARDO ARGENTON RAMOS', slots: [{ dia: 'QUI', horario: ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala: 'LAB ENG. SOFTWARE' }] },
-            { id: 'CCMP0280-CX-COMP', department: 'Eng. de Computação', name: 'ESTÁGIO SUPERVISIONADO', turma: 'CX', professor: 'ANA JULIA F. DE O. BARROS', slots: [{ dia: 'SEX', horario: ['18:00-18:50', '18:50-19:40', '19:40-20:30', '20:30-21:20'], sala: 'SALA 15' }] },
-            { id: 'CCMP0236-C4-COMP', department: 'Eng. de Computação', name: 'ESTATÍSTICA E PROBABILIDADE PARA COMPUTAÇÃO', turma: 'C4', professor: 'BRAULIRO GONÇALVES LEAL', slots: [{ dia: 'SEG', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 19' }, { dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 19' }] },
-            { id: 'CCMP0243-C6-COMP', department: 'Eng. de Computação', name: 'INSTRUMENTAÇÃO ELETRÔNICA', turma: 'C6', professor: 'JADSONLEE DA SILVA SÁ', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'LAB. HARDWARE' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'LAB. HARDWARE' }] },
-            { id: 'CCMP0244-C6-COMP', department: 'Eng. de Computação', name: 'INTELIGÊNCIA ARTIFICIAL', turma: 'C6', professor: 'ROSALVO FERREIRA DE OLIVEIRA NETO', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA VIRTUAL 5' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA VIRTUAL 5' }] },
-            { id: 'CCMP0249-CA-COMP', department: 'Eng. de Computação', name: 'LABORATÓRIO DE ELETRÔNICA ANALÓGICA', turma: 'CA', professor: 'ANA JULIA FERNANDES DE OLIVEIRA BARROS', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'ELETRÔNICA E SISTEMAS DIGITAIS' }] },
-            { id: 'CCMP0249-CB-COMP', department: 'Eng. de Computação', name: 'LABORATÓRIO DE ELETRÔNICA ANALÓGICA', turma: 'CB', professor: 'ANA JULIA FERNANDES DE OLIVEIRA BARROS', slots: [{ dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'ELETRÔNICA E SISTEMAS DIGITAIS' }] },
-            { id: 'CCMP0248-CA-COMP', department: 'Eng. de Computação', name: 'LABORATÓRIO DE ELETRÔNICA DIGITAL', turma: 'CA', professor: 'MAX SANTANA ROLEMBERG FARIAS', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'ELETRÔNICA E SISTEMAS DIGITAIS' }] },
-            { id: 'CCMP0248-CB-COMP', department: 'Eng. de Computação', name: 'LABORATÓRIO DE ELETRÔNICA DIGITAL', turma: 'CB', professor: 'MAX SANTANA ROLEMBERG FARIAS', slots: [{ dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA VIRTUAL 6' }] },
-            { id: 'CCMP0251-CA-COMP', department: 'Eng. de Computação', name: 'LABORATÓRIO DE REDE DE COMPUTADORES', turma: 'CA', professor: 'NÃO INFORMADO', slots: [{ dia: 'TER', horario: ['16:00-17:00', '17:00-18:00'], sala: 'LAB. REDES E SISTEMAS DISTRIBUÍDOS' }] },
-            { id: 'CCMP0251-CB-COMP', department: 'Eng. de Computação', name: 'LABORATÓRIO DE REDE DE COMPUTADORES', turma: 'CB', professor: 'NÃO INFORMADO', slots: [{ dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'LAB. REDES E SISTEMAS DISTRIBUÍDOS' }] },
-            { id: 'CCMP0253-C6-COMP', department: 'Eng. de Computação', name: 'LINGUAGENS FORMAIS E AUTOMATOS', turma: 'C6', professor: 'MARCUS VINICIUS MIDENA RAMOS', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 18' }, { dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 18' }] },
-            { id: 'CCMP0254-X1-COMP', department: 'Eng. de Computação', name: 'LÓGICA PARA COMPUTAÇÃO', turma: 'X1', professor: 'ROSALVO FERREIRA DE OLIVEIRA NETO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA VIRTUAL 2' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA VIRTUAL 2' }] },
-            { id: 'CCMP0255-X1-COMP', department: 'Eng. de Computação', name: 'MATEMÁTICA DISCRETA', turma: 'X1', professor: 'JORGE LUIS CAVALCANTI RAMOS', slots: [{ dia: 'TER', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA VIRTUAL 2' }, { dia: 'QUI', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA VIRTUAL 2' }] },
-            { id: 'CCMP0258-C8-COMP', department: 'Eng. de Computação', name: 'MODELAGEM E SIMULAÇÃO DISCRETA', turma: 'C8', professor: 'BRAULIRO GONÇALVES LEAL', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA VIRTUAL 4' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA VIRTUAL 4' }] },
-            { id: 'CCMP0260-C4-COMP', department: 'Eng. de Computação', name: 'PROGRAMAÇÃO ORIENTADA A OBJETOS', turma: 'C4', professor: 'ANA EMILIA DE MELO QUEIROZ', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'LAB PROG. BÁSICA' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'LAB PROG. BÁSICA' }] },
-            { id: 'CCMP0263-X3-COMP', department: 'Eng. de Computação', name: 'REDES DE COMPUTADORES', turma: 'X3', professor: 'NÃO INFORMADO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA VIRTUAL 6' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA VIRTUAL 6' }] },
-            { id: 'CCMP0264-CX-COMP', department: 'Eng. de Computação', name: 'ROBÓTICA II', turma: 'CX', professor: 'JURACY EMANUEL MAGALHÃES DA FRANCA', slots: [{ dia: 'SEX', horario: ['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala: 'LAB. AUTOMAÇÃO E ROBÓTICA INTELIGENTE' }] },
-            { id: 'CCMP0266-C8-COMP', department: 'Eng. de Computação', name: 'SISTEMAS DE CONTROLE II', turma: 'C8', professor: 'JURACY EMANUEL MAGALHÃES DA FRANCA', slots: [{ dia: 'SEX', horario: ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala: 'SALA 14' }] },
-            { id: 'CCMP0267-C8-COMP', department: 'Eng. de Computação', name: 'SISTEMAS DE TEMPO REAL', turma: 'C8', professor: 'JADSONLEE DA SILVA SÁ', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'LAB. HARDWARE' }, { dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'LAB. HARDWARE' }] },
-            { id: 'CCMP0268-C6-COMP', department: 'Eng. de Computação', name: 'SISTEMAS DISTRIBUÍDOS I', turma: 'C6', professor: 'JAIRSON BARBOSA RODRIGUES', slots: [{ dia: 'TER', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 18' }, { dia: 'QUI', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 18' }] },
-            { id: 'CCMP0273-C8-COMP', department: 'Eng. de Computação', name: 'TEORIA DA COMPUTAÇÃO', turma: 'C8', professor: 'MARCUS VINICIUS MIDENA RAMOS', slots: [{ dia: 'TER', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 14' }, { dia: 'QUI', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA VIRTUAL 6' }] },
-            { id: 'CCMP0078-CX-COMP', department: 'Eng. de Computação', name: 'TRABALHO DE CONCLUSÃO DE CURSO I', turma: 'CX', professor: 'RICARDO ARGENTON RAMOS', slots: [{ dia: 'SAB', horario: ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala: 'SALA 15' }] },
-            { id: 'CCMP0079-CX-COMP', department: 'Eng. de Computação', name: 'TRABALHO DE CONCLUSÃO DE CURSO II', turma: 'CX', professor: 'RICARDO ARGENTON RAMOS', slots: [{ dia: 'SAB', horario: ['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala: 'SALA 15' }] },
-            
             // Eng. Agrícola e Ambiental
-            { id: 'AGR10088-A8-AGR', department: 'Eng. Agrícola e Ambiental', name: 'AGRONEGOCIO E ECONOMIA RURAL', turma: 'A8', professor: 'LUCIENE DO NASCIMENTO MENDES', slots: [{ dia: 'SEG', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 26' }, { dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 26' }] },
-            { id: 'AGR10087-A8-AGR', department: 'Eng. Agrícola e Ambiental', name: 'AVALIAÇÃO E PERÍCIAS DE IMÓVEIS RURAIS', turma: 'A8', professor: 'SILVIA HELENA NOGUEIRA TURCO', slots: [{ dia: 'TER', horario: ['13:00-14:00', '14:00-15:00', '15:00-16:00'], sala: 'SALA 21' }] },
-            { id: 'MATM0120-TX-AGR', department: 'Eng. Agrícola e Ambiental', name: 'CÁLCULO DIFERENCIAL E INTEGRAL II', turma: 'TX', professor: 'YSMAILYN SIQUEIRA COSTA', slots: [{ dia: 'SEG', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 11' }, { dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 11' }] },
-            { id: 'AGR10005-A2-AGR', department: 'Eng. Agrícola e Ambiental', name: 'CITOLOGIA', turma: 'A2', professor: 'JOSE ALICANDRO BEZERRA DA SILVA', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 02' }] },
-            { id: 'AGRI0036-A8-AGR', department: 'Eng. Agrícola e Ambiental', name: 'CONSTRUÇÕES RURAIS E AMBIÊNCIA', turma: 'A8', professor: 'SILVIA HELENA NOGUEIRA TURCO', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 26' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala: 'SALA 26' }] },
-            { id: 'AGR10050-A8-AGR', department: 'Eng. Agrícola e Ambiental', name: 'DRENAGEM DE SOLOS AGRÍCOLAS', turma: 'A8', professor: 'CLOVIS MANOEL CARVALHO RAMOS', slots: [{ dia: 'TER', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 21' }, { dia: 'QUI', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 15' }] },
-            { id: 'MATM0117-TX-AGR', department: 'Eng. Agrícola e Ambiental', name: 'GEOMETRIA ANALÍTICA', turma: 'TX', professor: 'YSMAILYN SIQUEIRA COSTA', slots: [{ dia: 'TER', horario: ['08:00-09:00', '09:00-10:00'], sala: 'NT 03' }, { dia: 'QUI', horario: ['08:00-09:00', '09:00-10:00'], sala: 'NT 03' }] },
-            { id: 'AGR10043-A8-AGR', department: 'Eng. Agrícola e Ambiental', name: 'GESTÃO E LEGISLAÇÃO AMBIENTAL', turma: 'A8', professor: 'ΑΝΤΟΝΙΟ PEREIRA FILHO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 26' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 26' }] },
+            {id:'AGRI0088-A8', department:'Eng. Agrícola e Ambiental', name:'AGRONEGOCIO E ECONOMIA RURAL', turma:'A8', professor:'LUCIENE DO NASCIMENTO MENDES', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 26'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 26'}]},
+            {id:'AGRI0087-A8', department:'Eng. Agrícola e Ambiental', name:'AVALIAÇÃO E PERÍCIAS DE IMÓVEIS RURAIS', turma:'A8', professor:'SILVIA HELENA NOGUEIRA TURCO', slots:[{dia:'TER', horario:['13:00-14:00', '14:00-15:00', '15:00-16:00'], sala:'SALA 21'}]},
+            {id:'MATM0120-TX-AGR', department:'Eng. Agrícola e Ambiental', name:'CÁLCULO DIFERENCIAL E INTEGRAL II', turma:'TX', professor:'YSMAILYN SIQUEIRA COSTA', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 11'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 11'}]},
+            {id:'AGRI0005-A2', department:'Eng. Agrícola e Ambiental', name:'CITOLOGIA', turma:'A2', professor:'JOSE ALICANDRO BEZERRA DA SILVA', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 02'}]},
+            {id:'AGRI0005-AA', department:'Eng. Agrícola e Ambiental', name:'CITOLOGIA (Prática)', turma:'AA', professor:'JOSE ALICANDRO BEZERRA DA SILVA', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'CITOLOGIA E FISIOLOGIA VEGETAL'}]},
+            {id:'AGRI0005-AB', department:'Eng. Agrícola e Ambiental', name:'CITOLOGIA (Prática)', turma:'AB', professor:'JOSE ALICANDRO BEZERRA DA SILVA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'CITOLOGIA E FISIOLOGIA VEGETAL'}]},
+            {id:'AGRI0036-A8', department:'Eng. Agrícola e Ambiental', name:'CONSTRUÇÕES RURAIS E AMBIÊNCIA', turma:'A8', professor:'SILVIA HELENA NOGUEIRA TURCO', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 26'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala:'SALA 26'}]},
+            {id:'AGRI0038-A4', department:'Eng. Agrícola e Ambiental', name:'CRIAÇÃO DE ANIMAIS DOMÉSTICOS', turma:'A4', professor:'JOSE FERNANDO BIBIANO MELO', slots:[{dia:'QUI', horario:['13:00-14:00', '14:00-15:00'], sala:'SALA 04'}]},
+            {id:'AGRI0050-A8', department:'Eng. Agrícola e Ambiental', name:'DRENAGEM DE SOLOS AGRÍCOLAS', turma:'A8', professor:'CLOVIS MANOEL CARVALHO RAMOS', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 21'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 15'}]},
+            {id:'ELET0028-A6', department:'Eng. Agrícola e Ambiental', name:'ELETROTÉCNICA', turma:'A6', professor:'DANIEL DOS SANTOS COSTA', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 26'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 26'}]},
+            {id:'AGRI0049-A0', department:'Eng. Agrícola e Ambiental', name:'ESTÁGIO', turma:'A0', professor:'VANESSA POLON DONZELI', slots:[{dia:'QUI', horario:['18:00-18:50', '18:50-19:40'], sala:'SALA VIRTUAL - CENAMB 1'}]},
+            {id:'AGRI0082-A4', department:'Eng. Agrícola e Ambiental', name:'EXPERIMENTAÇÃO AGRICOLA', turma:'A4', professor:'MARLON DA SILVA GARRIDO', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 04'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 04'}]},
+            {id:'FISC0037-TX-AGR', department:'Eng. Agrícola e Ambiental', name:'FÍSICA BÁSICA', turma:'TX', professor:'JADERSON DE ARAUJO BARROS BARBOSA', slots:[{dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 11'}]},
+            {id:'FISC0042-4A-AGR', department:'Eng. Agrícola e Ambiental', name:'FÍSICA EXPERIMENTAL III', turma:'4A', professor:'RAQUEL ALINE PESSOA OLIVEIRA', slots:[{dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'FÍSICA EXPERIMENTAL I'}]},
+            {id:'FISC0042-A4-AGR', department:'Eng. Agrícola e Ambiental', name:'FÍSICA EXPERIMENTAL III', turma:'A4', professor:'RAQUEL ALINE PESSOA OLIVEIRA', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'FÍSICA EXPERIMENTAL I'}]},
+            {id:'FISC0036-A2-AGR', department:'Eng. Agrícola e Ambiental', name:'FÍSICA TEÓRICA I', turma:'A2', professor:'MILITAO VIEIRA FIGUEREDO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 16'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 16'}]},
+            {id:'AGRI0032-A6', department:'Eng. Agrícola e Ambiental', name:'FITOTECNIA', turma:'A6', professor:'ACÁCIO FIGUEIREDO NETO', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 26'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 26'}]},
+            {id:'CIEN0002-A4', department:'Eng. Agrícola e Ambiental', name:'GÊNESE MORFOLOGIA E CLASSIFICAÇÃO DE SOLOS', turma:'A4', professor:'CARMEM SUEZE SILVA MIRANDA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 9'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 9'}]},
+            {id:'MATM0117-TX-AGR', department:'Eng. Agrícola e Ambiental', name:'GEOMETRIA ANALÍTICA', turma:'TX', professor:'YSMAILYN SIQUEIRA COSTA', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'NT 03'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'NT 03'}]},
+            {id:'AGRI0029-A6', department:'Eng. Agrícola e Ambiental', name:'GEOPROCESSAMENTO', turma:'A6', professor:'THAIS PEREIRA DE AZEVEDO', slots:[{dia:'SEX', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'SALA 9'}]},
+            {id:'AGRI0043-A8', department:'Eng. Agrícola e Ambiental', name:'GESTÃO E LEGISLAÇÃO AMBIENTAL', turma:'A8', professor:'ANTONIO PEREIRA FILHO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 26'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 26'}]},
+            {id:'AGRI0022-A6', department:'Eng. Agrícola e Ambiental', name:'HIDROLOGIA', turma:'A6', professor:'CLOVIS MANOEL CARVALHO RAMOS', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 26'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 26'}]},
+            {id:'AGRI0023-A6', department:'Eng. Agrícola e Ambiental', name:'MANEJO E CONSERVAÇÃO DO SOLO E DA ÁGUA', turma:'A6', professor:'NELCI OLSZEVSKI', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 26'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 26'}]},
+            {id:'AGRI0045-A8', department:'Eng. Agrícola e Ambiental', name:'MÁQUINAS E IMPLEMENTOS AGRÍCOLAS', turma:'A8', professor:'JARDENIA RODRIGUES FEITOSA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 21'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 16'}]},
+            {id:'MECN0017-A4-AGR', department:'Eng. Agrícola e Ambiental', name:'MECÂNICA DOS SÓLIDOS I - ESTÁTICA', turma:'A4', professor:'DIAN LOURENCONI', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 02'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 02'}]},
+            {id:'AGRI0015-A6', department:'Eng. Agrícola e Ambiental', name:'METEOROLOGIA E CLIMATOLOGIA', turma:'A6', professor:'MARIO DE MIRANDA VILAS BOAS RAMOS LEITAO', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 21'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 21'}]},
+            {id:'CIEN0003-A2-AGR', department:'Eng. Agrícola e Ambiental', name:'METODOLOGIA DA PESQUISA', turma:'A2', professor:'PAULO GUSTAVO SERAFIM DE CARVALHO', slots:[{dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 02'}]},
+            {id:'AGRI0014-A4-AGR', department:'Eng. Agrícola e Ambiental', name:'MICROBIOLOGIA GERAL', turma:'A4', professor:'VANESSA POLON DONZELI', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 04'}]},
+            {id:'AGRI0014-AA-AGR', department:'Eng. Agrícola e Ambiental', name:'MICROBIOLOGIA GERAL (Prática)', turma:'AA', professor:'VANESSA POLON DONZELI', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'MICROBIOLOGIA GERAL E AMBIENTAL'}]},
+            {id:'AGRI0014-AB-AGR', department:'Eng. Agrícola e Ambiental', name:'MICROBIOLOGIA GERAL (Prática)', turma:'AB', professor:'VANESSA POLON DONZELI', slots:[{dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'MICROBIOLOGIA GERAL E AMBIENTAL'}]},
+            {id:'BIOL0276-AX-AGR', department:'Eng. Agrícola e Ambiental', name:'MICROBIOLOGIA GERAL PRÁTICA', turma:'AX', professor:'VANESSA POLON DONZELI', slots:[{dia:'SEG', horario:['18:00-18:50', '18:50-19:40'], sala:'MICROBIOLOGIA GERAL E AMBIENTAL'}]},
+            {id:'AGRI0057-A0', department:'Eng. Agrícola e Ambiental', name:'NÚCLEO TEMÁTICO - AGRICULTURA DE PRECISÃO', turma:'A0', professor:'DANIEL DOS SANTOS COSTA', slots:[{dia:'SEG', horario:['18:00-18:50', '18:50-19:40', '19:40-20:30', '20:30-21:20'], sala:'SALA 07'}]},
+            {id:'AGRI0085-A6', department:'Eng. Agrícola e Ambiental', name:'POLUIÇÃO AMBIENTAL', turma:'A6', professor:'MIRIAM CLEIDE CAVALCANTE DE AMORIM', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 14'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 14'}]},
+            {id:'QUIM0010-A2', department:'Eng. Agrícola e Ambiental', name:'QUÍMICA ANALÍTICA - AGR', turma:'A2', professor:'ADRIANA MORENO COSTA SILVA', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 02'}]},
+            {id:'QUIM0010-AA-AGR', department:'Eng. Agrícola e Ambiental', name:'QUÍMICA ANALÍTICA - AGR (Prática)', turma:'AA', professor:'ADRIANA MORENO COSTA SILVA', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'QUÍMICA ANALÍTICA E QUÍMICA DO SOLO'}]},
+            {id:'QUIM0010-AB-AGR', department:'Eng. Agrícola e Ambiental', name:'QUÍMICA ANALÍTICA - AGR (Prática)', turma:'AB', professor:'ADRIANA MORENO COSTA SILVA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'QUÍMICA ANALÍTICA E QUÍMICA DO SOLO'}]},
+            {id:'QUIM0011-A2-AGR', department:'Eng. Agrícola e Ambiental', name:'QUÍMICA ORGÂNICA', turma:'A2', professor:'LEONARDO SOUSA CAVALCANTI', slots:[{dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 03'}]},
+            {id:'QUIM0011-AA-AGR', department:'Eng. Agrícola e Ambiental', name:'QUÍMICA ORGÂNICA (Prática)', turma:'AA', professor:'LEONARDO SOUSA CAVALCANTI', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00'], sala:'QUÍMICA ORGÂNICA E BIOQUÍMICA'}]},
+            {id:'QUIM0011-AB-AGR', department:'Eng. Agrícola e Ambiental', name:'QUÍMICA ORGÂNICA (Prática)', turma:'AB', professor:'LEONARDO SOUSA CAVALCANTI', slots:[{dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'QUÍMICA ORGÂNICA E BIOQUÍMICA'}]},
+            {id:'QUIM0062-AX-AGR', department:'Eng. Agrícola e Ambiental', name:'QUÍMICA ORGÂNICA PRÁTICA', turma:'AX', professor:'LEONARDO SOUSA CAVALCANTI', slots:[{dia:'QUI', horario:['18:00-18:50', '18:50-19:40'], sala:'QUÍMICA ORGÂNICA E BIOQUÍMICA'}]},
+            {id:'AGRI0031-A8', department:'Eng. Agrícola e Ambiental', name:'SANEAMENTO BÁSICO', turma:'A8', professor:'MIRIAM CLEIDE CAVALCANTE DE AMORIM', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 26'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 26'}]},
+            {id:'AGRI0054-AX', department:'Eng. Agrícola e Ambiental', name:'TECNOLOGIA PÓS-COLHEITA', turma:'AX', professor:'ACÁCIO FIGUEIREDO NETO', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SALA 15'}]},
+            {id:'AGRI0095-A8', department:'Eng. Agrícola e Ambiental', name:'TOPICOS ESPECIAIS EM ENGENHARIA AGRICOLA I', turma:'A8', professor:'LEONARDO SOUSA CAVALCANTI', slots:[{dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 21'}]},
+            {id:'AGRI0083-A4', department:'Eng. Agrícola e Ambiental', name:'TOPOGRAFIA PLANIMETRIA', turma:'A4', professor:'THAIS PEREIRA DE AZEVEDO', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SALA 10'}]},
+            {id:'AGRI0048-A0', department:'Eng. Agrícola e Ambiental', name:'TRABALHO DE CONCLUSÃO DE CURSO', turma:'A0', professor:'MARLON DA SILVA GARRIDO', slots:[{dia:'TER', horario:['18:00-18:50', '18:50-19:40'], sala:'SALA VIRTUAL - CENAMB 1'}]},
+            
+            // Eng. de Computação
+            {id:'ADMT0027-C6', department:'Eng. de Computação', name:'ADMINISTRAÇÃO PARA ENGENHARIA', turma:'C6', professor:'ANGELO ANTONIO MACEDO LEITE', slots:[{dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA VIRTUAL 5/ ENG COMPUTACAO'}]},
+            {id:'CCMP0211-X1', department:'Eng. de Computação', name:'ALGORITMO E PROGRAMAÇÃO PARA COMPUTAÇÃO', turma:'X1', professor:'ANA EMILIA DE MELO QUEIROZ', slots:[{dia:'SEG', horario:['13:00-14:00', '14:00-15:00'], sala:'LAB PROGRAMAÇÃO BÁSICA'}, {dia:'QUA', horario:['13:00-14:00', '14:00-15:00'], sala:'LAB PROGRAMAÇÃO BÁSICA'}]},
+            {id:'CCMP0210-2C', department:'Eng. de Computação', name:'ALGORITMOS E ESTRUTURA DE DADOS', turma:'2C', professor:'MARCELO SANTOS LINDER', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'LAB PROGRAMAÇÃO AVANÇADA'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'LAB PROGRAMAÇÃO AVANÇADA'}]},
+            {id:'CCMP0210-C2', department:'Eng. de Computação', name:'ALGORITMOS E ESTRUTURA DE DADOS', turma:'C2', professor:'MARCELO SANTOS LINDER', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'LAB PROGRAMAÇÃO BÁSICA'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'LAB PROGRAMAÇÃO BÁSICA'}]},
+            {id:'CCMP0058-C8', department:'Eng. de Computação', name:'ASPECTOS LEGAIS PARA COMPUTAÇÃO', turma:'C8', professor:'NÃO INFORMADO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 13'}]},
+            {id:'CCMP0220-C6', department:'Eng. de Computação', name:'BANCO DE DADOS II', turma:'C6', professor:'MARIO GODOY NETO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 18'}]},
+            {id:'MATM0123-C4', department:'Eng. de Computação', name:'CÁLCULO NUMÉRICO', turma:'C4', professor:'JORGE LUIS CAVALCANTI RAMOS', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'NT 01'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'NT 01'}]},
+            {id:'CCMP0229-C8', department:'Eng. de Computação', name:'ELEMENTOS DE CRIPTOGRAFIA E SEGURANÇA', turma:'C8', professor:'JAIRSON BARBOSA RODRIGUES', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA VIRTUAL 3/ ENG COMPUTACAO'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA VIRTUAL 3/ ENG COMPUTACAO'}]},
+            {id:'CCMP0230-C4', department:'Eng. de Computação', name:'ELETRÔNICA ANALÓGICA', turma:'C4', professor:'ANA JULIA FERNANDES DE OLIVEIRA BARROS', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 19'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 19'}]},
+            {id:'CCMP0231-C2', department:'Eng. de Computação', name:'ELETRÔNICA DIGITAL', turma:'C2', professor:'MAX SANTANA ROLEMBERG FARIAS', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:''}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:''}]},
+            {id:'CCMP0234-C6', department:'Eng. de Computação', name:'ENGENHARIA DE SOFTWARE II', turma:'C6', professor:'RICARDO ARGENTON RAMOS', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SALA 18'}]},
+            {id:'CCMP0235-CX', department:'Eng. de Computação', name:'ENGENHARIA DE SOFTWARE III', turma:'CX', professor:'RICARDO ARGENTON RAMOS', slots:[{dia:'QUI', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'LAB. ENG. SOFTWARE E BANCO DE DADOS'}]},
+            {id:'CCMP0280-CX', department:'Eng. de Computação', name:'ESTÁGIO SUPERVISIONADO', turma:'CX', professor:'ANA JULIA FERNANDES DE OLIVEIRA BARROS', slots:[{dia:'SEX', horario:['18:00-18:50', '18:50-19:40', '19:40-20:30', '20:30-21:20'], sala:'SALA 15'}]},
+            {id:'CCMP0236-C4', department:'Eng. de Computação', name:'ESTATÍSTICA E PROBABILIDADE PARA COMPUTAÇÃO', turma:'C4', professor:'BRAULIRO GONÇALVES LEAL', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 19'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 19'}]},
+            {id:'CCMP0243-C6', department:'Eng. de Computação', name:'INSTRUMENTAÇÃO ELETRÔNICA', turma:'C6', professor:'JADSONLEE DA SILVA SÁ', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'LAB. HARDWARE'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'LAB. HARDWARE'}]},
+            {id:'CCMP0244-C6', department:'Eng. de Computação', name:'INTELIGÊNCIA ARTIFICIAL', turma:'C6', professor:'ROSALVO FERREIRA DE OLIVEIRA NETO', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA VIRTUAL 5/ ENG COMPUTACAO'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA VIRTUAL 5/ ENG COMPUTACAO'}]},
+            {id:'CCMP0249-CA', department:'Eng. de Computação', name:'LABORATÓRIO DE ELETRÔNICA ANALÓGICA', turma:'CA', professor:'ANA JULIA FERNANDES DE OLIVEIRA BARROS', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'CCMP0249-CB', department:'Eng. de Computação', name:'LABORATÓRIO DE ELETRÔNICA ANALÓGICA', turma:'CB', professor:'ANA JULIA FERNANDES DE OLIVEIRA BARROS', slots:[{dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'CCMP0248-CA', department:'Eng. de Computação', name:'LABORATÓRIO DE ELETRÔNICA DIGITAL', turma:'CA', professor:'MAX SANTANA ROLEMBERG FARIAS', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'CCMP0248-CB', department:'Eng. de Computação', name:'LABORATÓRIO DE ELETRÔNICA DIGITAL', turma:'CB', professor:'MAX SANTANA ROLEMBERG FARIAS', slots:[{dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA VIRTUAL 6/ ENG COMPUTACAO'}]},
+            {id:'CCMP0251-CA', department:'Eng. de Computação', name:'LABORATÓRIO DE REDE DE COMPUTADORES', turma:'CA', professor:'NÃO INFORMADO', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'LAB. REDES E SISTEMAS DISTRIBUÍDOS'}]},
+            {id:'CCMP0251-CB', department:'Eng. de Computação', name:'LABORATÓRIO DE REDE DE COMPUTADORES', turma:'CB', professor:'NÃO INFORMADO', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'LAB. REDES E SISTEMAS DISTRIBUÍDOS'}]},
+            {id:'CCMP0253-C6', department:'Eng. de Computação', name:'LINGUAGENS FORMAIS E AUTÔMATOS', turma:'C6', professor:'MARCUS VINICIUS MIDENA RAMOS', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 18'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 18'}]},
+            {id:'CCMP0254-X1', department:'Eng. de Computação', name:'LÓGICA PARA COMPUTAÇÃO', turma:'X1', professor:'ROSALVO FERREIRA DE OLIVEIRA NETO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA VIRTUAL 2/ ENG COMPUTACAO'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA VIRTUAL 2/ ENG COMPUTACAO'}]},
+            {id:'CCMP0255-X1', department:'Eng. de Computação', name:'MATEMÁTICA DISCRETA', turma:'X1', professor:'JORGE LUIS CAVALCANTI RAMOS', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA VIRTUAL 2/ ENG COMPUTACAO'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA VIRTUAL 2/ ENG COMPUTACAO'}]},
+            {id:'CCMP0258-C8', department:'Eng. de Computação', name:'MODELAGEM E SIMULAÇÃO DISCRETA', turma:'C8', professor:'BRAULIRO GONÇALVES LEAL', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA VIRTUAL 4/ ENG COMPUTACAO'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA VIRTUAL 4/ ENG COMPUTACAO'}]},
+            {id:'CCMP0260-C4', department:'Eng. de Computação', name:'PROGRAMAÇÃO ORIENTADA A OBJETOS', turma:'C4', professor:'ANA EMILIA DE MELO QUEIROZ', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'LAB PROGRAMAÇÃO BÁSICA'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'LAB PROGRAMAÇÃO BÁSICA'}]},
+            {id:'CCMP0263-X3', department:'Eng. de Computação', name:'REDES DE COMPUTADORES', turma:'X3', professor:'NÃO INFORMADO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA VIRTUAL 6/ ENG COMPUTACAO'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA VIRTUAL 6/ ENG COMPUTACAO'}]},
+            {id:'CCMP0264-CX', department:'Eng. de Computação', name:'ROBÓTICA II', turma:'CX', professor:'JURACY EMANUEL MAGALHÃES DA FRANCA', slots:[{dia:'SEX', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'LAB. AUTOMAÇÃO E ROBÓTICA INTELIGENTE'}]},
+            {id:'CCMP0266-C8', department:'Eng. de Computação', name:'SISTEMAS DE CONTROLE II', turma:'C8', professor:'JURACY EMANUEL MAGALHÃES DA FRANCA', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SALA 14'}]},
+            {id:'CCMP0267-C8', department:'Eng. de Computação', name:'SISTEMAS DE TEMPO REAL', turma:'C8', professor:'JADSONLEE DA SILVA SÁ', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'LAB. HARDWARE'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'LAB. HARDWARE'}]},
+            {id:'CCMP0268-C6', department:'Eng. de Computação', name:'SISTEMAS DISTRIBUÍDOS I', turma:'C6', professor:'JAIRSON BARBOSA RODRIGUES', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 18'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 18'}]},
+            {id:'CCMP0273-C8', department:'Eng. de Computação', name:'TEORIA DA COMPUTAÇÃO', turma:'C8', professor:'MARCUS VINICIUS MIDENA RAMOS', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 14'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA VIRTUAL 6/ ENG COMPUTACAO'}]},
+            {id:'CCMP0078-CX', department:'Eng. de Computação', name:'TRABALHO DE CONCLUSÃO DE CURSO I', turma:'CX', professor:'RICARDO ARGENTON RAMOS', slots:[{dia:'SAB', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SALA 15'}]},
+            {id:'CCMP0079-CX', department:'Eng. de Computação', name:'TRABALHO DE CONCLUSÃO DE CURSO II', turma:'CX', professor:'RICARDO ARGENTON RAMOS', slots:[{dia:'SAB', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'SALA 15'}]},
 
             // Eng. Elétrica
-            { id: 'ADMT0027-E8-ELET', department: 'Eng. Elétrica', name: 'ADMINISTRAÇÃO PARA ENGENHARIA', turma: 'E8', professor: 'ANGELO ANTONIO MACEDO LEITE', slots: [{ dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 15' }] },
-            { id: 'MATM0118-E2-ELET', department: 'Eng. Elétrica', name: 'ÁLGEBRA LINEAR', turma: 'E2', professor: 'BETO ROBER BAUTISTA SAAVEDRA', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 8' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 8' }] },
-            { id: 'ELET0014-E4-ELET', department: 'Eng. Elétrica', name: 'CIRCUITOS ELÉTRICOS I', turma: 'E4', professor: 'RICARDO MENEZES PRATES', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 9' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 9' }] },
-            { id: 'ELET0034-E6-ELET', department: 'Eng. Elétrica', name: 'ELETROMAGNETISMO', turma: 'E6', professor: 'EDUARD MONTGOMERY MEIRA COSTA', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 14' }, { dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 14' }] },
-            { id: 'ECON0006-E8-ELET', department: 'Eng. Elétrica', name: 'ENGENHARIA ECONÔMICA', turma: 'E8', professor: 'RENNAN KERTLLY DE MEDEIROS', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 12' }, { dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 12' }] },
-            { id: 'MATM0117-EX-ELET', department: 'Eng. Elétrica', name: 'GEOMETRIA ANALÍTICA', turma: 'EX', professor: 'NÃO INFORMADO', slots: [{ dia: 'SEG', horario: ['08:00-09:00', '09:00-10:00'], sala: 'NT 02' }, { dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'NT 02' }] },
-            { id: 'ELET0051-E8-ELET', department: 'Eng. Elétrica', name: 'INSTALAÇÕES ELÉTRICAS', turma: 'E8', professor: 'RICARDO MENEZES PRATES', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 15' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 15' }] },
-            
+            {id:'ADMT0027-E8', department:'Eng. Elétrica', name:'ADMINISTRAÇÃO PARA ENGENHARIA', turma:'E8', professor:'ANGELO ANTONIO MACEDO LEITE', slots:[{dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 15'}]},
+            {id:'MATM0118-E2', department:'Eng. Elétrica', name:'ÁLGEBRA LINEAR', turma:'E2', professor:'BETO ROBER BAUTISTA SAAVEDRA', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 8'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 8'}]},
+            {id:'CCMP0016-E2', department:'Eng. Elétrica', name:'ALGORITMO E PROGRAMAÇÃO', turma:'E2', professor:'RAFAEL MOURA DUARTE', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 8'}]},
+            {id:'CCMP0016-EA-ELET', department:'Eng. Elétrica', name:'ALGORITMO E PROGRAMAÇÃO (Prática)', turma:'EA', professor:'RAFAEL MOURA DUARTE', slots:[{dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'COMPUTAÇÃO I'}]},
+            {id:'CCMP0016-EB-ELET', department:'Eng. Elétrica', name:'ALGORITMO E PROGRAMAÇÃO (Prática)', turma:'EB', professor:'RAFAEL MOURA DUARTE', slots:[{dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'COMPUTAÇÃO I'}]},
+            {id:'ELET0026-EX', department:'Eng. Elétrica', name:'ANÁLISE DE SINAIS E SISTEMAS', turma:'EX', professor:'EDMAR JOSÉ DO NASCIMENTO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 22'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 22'}]},
+            {id:'MATM0120-E2', department:'Eng. Elétrica', name:'CÁLCULO DIFERENCIAL E INTEGRAL II', turma:'E2', professor:'ALEXANDRE RAMALHO SILVA', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 01'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 01'}]},
+            {id:'MATM0120-EX-ELET', department:'Eng. Elétrica', name:'CÁLCULO DIFERENCIAL E INTEGRAL II', turma:'EX', professor:'LINO MARCOS DA SILVA', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 9'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 9'}]},
+            {id:'MATM0122-E4', department:'Eng. Elétrica', name:'CÁLCULO DIFERENCIAL E INTEGRAL IV', turma:'E4', professor:'EDSON LEITE ARAUJO', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 15'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 15'}]},
+            {id:'CIEN0004-E2', department:'Eng. Elétrica', name:'CIÊNCIA E TECNOLOGIA DOS MATERIAIS', turma:'E2', professor:'NELSON CARDENAS OLIVIER', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 8'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 8'}]},
+            {id:'ELET0014-E4', department:'Eng. Elétrica', name:'CIRCUITOS ELÉTRICOS I', turma:'E4', professor:'RICARDO MENEZES PRATES', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 9'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 9'}]},
+            {id:'ELET0020-EA-ELET', department:'Eng. Elétrica', name:'CIRCUITOS ELÉTRICOS II (Prática)', turma:'EA', professor:'ADEON CECILIO PINTO', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'ELET0020-EB-ELET', department:'Eng. Elétrica', name:'CIRCUITOS ELÉTRICOS II (Prática)', turma:'EB', professor:'ADEON CECILIO PINTO', slots:[{dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'ELET0020-EX', department:'Eng. Elétrica', name:'CIRCUITOS ELÉTRICOS II', turma:'EX', professor:'ADEON CECILIO PINTO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 22'}, {dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 22'}]},
+            {id:'ELET0032-E6', department:'Eng. Elétrica', name:'CIRCUITOS ELÉTRICOS III', turma:'E6', professor:'MANOEL DE OLIVEIRA SANTOS SOBRINHO', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 9'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 9'}]},
+            {id:'ELET0050-E6', department:'Eng. Elétrica', name:'CONTROLE I - 60', turma:'E6', professor:'MANOEL DE OLIVEIRA SANTOS SOBRINHO', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 14'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 14'}]},
+            {id:'ELET0035-E6', department:'Eng. Elétrica', name:'CONVERSÃO ELETROMECÂNICA DE ENERGIA', turma:'E6', professor:'EDGARDO GUILLERMO CAMACHO PALOMINO', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 9'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 9'}]},
+            {id:'DPRJ0012-EA-ELET', department:'Eng. Elétrica', name:'DESENHO TÉCNICO - 60', turma:'EA', professor:'FABIO JOSE DE MATOS BARBOSA', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'EXPRESSÃO GRÁFICA I'}]},
+            {id:'DPRJ0012-EB-ELET', department:'Eng. Elétrica', name:'DESENHO TÉCNICO - 60', turma:'EB', professor:'SÍLVIA PATRÍCIA DE OLIVEIRA SOUZA COÊLHO', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'EXPRESSÃO GRÁFICA II'}]},
+            {id:'ELET0034-E6', department:'Eng. Elétrica', name:'ELETROMAGNETISMO', turma:'E6', professor:'EDUARD MONTGOMERY MEIRA COSTA', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 14'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 14'}]},
+            {id:'ELET0030-E6', department:'Eng. Elétrica', name:'ELETRÔNICA ANALÓGICA', turma:'E6', professor:'ISNALDO JOSE DE SOUZA COELHO', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 14'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 14'}]},
+            {id:'ELET0090-EA-ELET', department:'Eng. Elétrica', name:'ELETRÔNICA DIGITAL II - PRÁTICA', turma:'EA', professor:'RODRIGO PEREIRA RAMOS', slots:[{dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'ELET0090-EB-ELET', department:'Eng. Elétrica', name:'ELETRÔNICA DIGITAL II - PRÁTICA', turma:'EB', professor:'RODRIGO PEREIRA RAMOS', slots:[{dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'ELET0089-E4', department:'Eng. Elétrica', name:'ELETRÔNICA DIGITAL II - TEORIA', turma:'E4', professor:'RODRIGO PEREIRA RAMOS', slots:[{dia:'SEX', horario:['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala:'SALA 9'}]},
+            {id:'ECON0006-E8', department:'Eng. Elétrica', name:'ENGENHARIA ECONÔMICA', turma:'E8', professor:'RENNAN KERTLLY DE MEDEIROS', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 12'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 12'}]},
+            {id:'ELET0060-E0', department:'Eng. Elétrica', name:'ESTÁGIO', turma:'E0', professor:'EDUARD MONTGOMERY MEIRA COSTA', slots:[{dia:'SAB', horario:['18:50-19:40', '19:40-20:30', '20:30-21:20', '21:20-22:10'], sala:'ELETRÔNICA E AUTOMAÇÃO'}]},
+            {id:'PRBE0014-EX', department:'Eng. Elétrica', name:'ESTATÍSTICA APLICADA À ENGENHARIA', turma:'EX', professor:'DENNIS MARINHO OLIVEIRA RAMALHO DE SOUZA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 22'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 22'}, {dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'COMPUTAÇÃO II'}]},
+            {id:'FISC0042-4E', department:'Eng. Elétrica', name:'FÍSICA EXPERIMENTAL III', turma:'4E', professor:'HELINANDO PEQUENO DE OLIVEIRA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'FÍSICA EXPERIMENTAL II'}]},
+            {id:'FISC0042-E4', department:'Eng. Elétrica', name:'FÍSICA EXPERIMENTAL III', turma:'E4', professor:'HELINANDO PEQUENO DE OLIVEIRA', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'FÍSICA EXPERIMENTAL II'}]},
+            {id:'FISC0036-E2', department:'Eng. Elétrica', name:'FÍSICA TEÓRICA I', turma:'E2', professor:'WAGNER DE ASSIS CANGUSSU PASSOS', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 8'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 8'}]},
+            {id:'FISC0039-E4', department:'Eng. Elétrica', name:'FÍSICA TEÓRICA III', turma:'E4', professor:'MARCIO PAZETTI', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 07'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 07'}]},
+            {id:'MATM0117-EX-ELET', department:'Eng. Elétrica', name:'GEOMETRIA ANALÍTICA', turma:'EX', professor:'NÃO INFORMADO', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'NT 02'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'NT 02'}]},
+            {id:'ELET0056-EX', department:'Eng. Elétrica', name:'GERAÇÃO TRANSMISSÃO E DISTRIBUIÇÃO DE ENERGIA', turma:'EX', professor:'EDGARDO GUILLERMO CAMACHO PALOMINO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 01'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 01'}]},
+            {id:'ELET0051-E8', department:'Eng. Elétrica', name:'INSTALAÇÕES ELÉTRICAS', turma:'E8', professor:'RICARDO MENEZES PRATES', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 15'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 15'}]},
+            {id:'ELET0055-E8', department:'Eng. Elétrica', name:'INSTRUMENTAÇÃO ELETRÔNICA', turma:'E8', professor:'JOSÉ AMÉRICO DE SOUSA MOURA', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'ELETROTÉCNICA'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'ELETROTÉCNICA'}]},
+            {id:'ELET0049-EA-ELET', department:'Eng. Elétrica', name:'LABORATÓRIO DE CONTROLE I', turma:'EA', professor:'EDUARD MONTGOMERY MEIRA COSTA', slots:[{dia:'SEX', horario:['14:00-15:00', '15:00-16:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'ELET0049-EB-ELET', department:'Eng. Elétrica', name:'LABORATÓRIO DE CONTROLE I', turma:'EB', professor:'EDUARD MONTGOMERY MEIRA COSTA', slots:[{dia:'SEX', horario:['16:00-17:00', '17:00-18:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'ELET0031-EA-ELET', department:'Eng. Elétrica', name:'LABORATÓRIO DE ELETRÔNICA ANALÓGICA', turma:'EA', professor:'ISNALDO JOSE DE SOUZA COELHO', slots:[{dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'ELETRÔNICA E SISTEMAS DIGITAIS'}]},
+            {id:'ELET0053-E8', department:'Eng. Elétrica', name:'LABORATÓRIO DE MÁQUINAS ELÉTRICAS', turma:'E8', professor:'JOAQUIM JUNIOR ISIDIO DE LIMA', slots:[{dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'ELETROMAGNETISMO APLICADO'}]},
+            {id:'ELET0052-E8', department:'Eng. Elétrica', name:'MÁQUINAS ELÉTRICAS', turma:'E8', professor:'JOAQUIM JUNIOR ISIDIO DE LIMA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 15'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 15'}]},
+            {id:'ELET0005-E6', department:'Eng. Elétrica', name:'MATERIAIS ELÉTRICOS', turma:'E6', professor:'ANTONIO DE ALMEIDA FERNANDES', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'ELETROTÉCNICA'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'ELETROTÉCNICA'}]},
+            {id:'CIEN0005-E2', department:'Eng. Elétrica', name:'MEIO AMBIENTE E DESENVOLVIMENTO SUSTENTÁVEL', turma:'E2', professor:'ANTONIO PEREIRA FILHO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 8'}]},
+            {id:'CIEN0003-E2', department:'Eng. Elétrica', name:'METODOLOGIA DA PESQUISA', turma:'E2', professor:'JOAQUIM JUNIOR ISIDIO DE LIMA', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 06'}]},
+            {id:'ELET0083-E0', department:'Eng. Elétrica', name:'NÚCLEO TEMÁTICO - FONTES ALTERNATIVAS DE ENERGIA', turma:'E0', professor:'VARIOS', slots:[{dia:'SAB', horario:['09:00-10:00', '10:00-11:00'], sala:'SALA 22'}]},
+            {id:'QUIM0018-EX-ELET', department:'Eng. Elétrica', name:'QUÍMICA GERAL PRÁTICA', turma:'EX', professor:'ANDRÉA DE VASCONCELOS FERRAZ', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'QUIM0018-XE', department:'Eng. Elétrica', name:'QUÍMICA GERAL PRÁTICA', turma:'XE', professor:'ANDRÉA DE VASCONCELOS FERRAZ', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'MECN0015-E6', department:'Eng. Elétrica', name:'RESISTÊNCIA DOS MATERIAIS I', turma:'E6', professor:'JOÃO CARLOS SEDRAZ SILVA', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 07'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 10'}]},
+            {id:'ELET0042-EX', department:'Eng. Elétrica', name:'SISTEMAS ELÉTRICOS I', turma:'EX', professor:'EUBIS PEREIRA MACHADO', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 22'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 22'}]},
+            {id:'ELET0054-E8', department:'Eng. Elétrica', name:'SISTEMAS ELÉTRICOS II', turma:'E8', professor:'EUBIS PEREIRA MACHADO', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 15'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 15'}]},
+            {id:'ELET0073-E0', department:'Eng. Elétrica', name:'TÓPICOS AVANÇADOS EM ENGENHARIA ELÉTRICA II', turma:'E0', professor:'EDMAR JOSÉ DO NASCIMENTO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 15'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 15'}]},
+            {id:'ELET0059-EX', department:'Eng. Elétrica', name:'TRABALHO DE CONCLUSÃO DE CURSO', turma:'EX', professor:'MANOEL DE OLIVEIRA SANTOS SOBRINHO', slots:[{dia:'SAB', horario:['16:00-17:00', '17:00-18:00'], sala:'ELETRÔNICA E AUTOMAÇÃO'}]},
+
             // Eng. Mecânica
-            { id: 'MATM0118-M2-MEC', department: 'Eng. Mecânica', name: 'ÁLGEBRA LINEAR', turma: 'M2', professor: 'CARLOS ANTONIO FREITAS DA SILVA', slots: [{ dia: 'SEG', horario: ['08:00-09:00', '09:00-10:00'], sala: 'NT 01' }, { dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'NT 01' }] },
-            { id: 'MECN0045-M9-MEC', department: 'Eng. Mecânica', name: 'ECONOMIA PARA ENGENHARIA', turma: 'M9', professor: 'ALAN FRANCISCO CARVALHO PEREIRA', slots: [{ dia: 'SEX', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 24' }] },
-            { id: 'MECN0032-M7-MEC', department: 'Eng. Mecânica', name: 'ELEMENTOS DE MÁQUINAS II', turma: 'M7', professor: 'JOSE BISMARK DE MEDEIROS', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 23' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 23' }] },
-            { id: 'DPRJ0013-MA-MEC', department: 'Eng. Mecânica', name: 'GEOMETRIA DESCRITIVA', turma: 'MA', professor: 'BEATRIZ LEMOS CAVALCANTE DE CARVALHO SANTIAGO', slots: [{ dia: 'TER', horario: ['13:00-14:00', '14:00-15:00', '15:00-16:00'], sala: 'EXPRESSÃO GRÁFICA I' }] },
-            { id: 'DPRJ0013-MB-MEC', department: 'Eng. Mecânica', name: 'GEOMETRIA DESCRITIVA', turma: 'MB', professor: 'BEATRIZ LEMOS CAVALCANTE DE CARVALHO SANTIAGO', slots: [{ dia: 'SEX', horario: ['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala: 'EXPRESSÃO GRÁFICA I' }] },
-            { id: 'MECN0019-M5-MEC', department: 'Eng. Mecânica', name: 'MECÂNICA DOS FLUIDOS I', turma: 'M5', professor: 'EDNA SANTIAGO BENTA', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 18' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 18' }] },
-            { id: 'MECN0020-M5-MEC', department: 'Eng. Mecânica', name: 'TERMODINAMICA BÁSICA', turma: 'M5', professor: 'LUIZ MARIANO PEREIRA', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'NT 02' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'NT 02' }] },
-            
+            {id:'MATM0118-M2', department:'Eng. Mecânica', name:'ÁLGEBRA LINEAR', turma:'M2', professor:'CARLOS ANTONIO FREITAS DA SILVA', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'NT 01'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'NT 01'}]},
+            {id:'CCMP0016-M2', department:'Eng. Mecânica', name:'ALGORITMO E PROGRAMAÇÃO', turma:'M2', professor:'NÃO INFORMADO', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 01'}]},
+            {id:'CCMP0016-MA-MEC', department:'Eng. Mecânica', name:'ALGORITMO E PROGRAMAÇÃO (Prática)', turma:'MA', professor:'NÃO INFORMADO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'COMPUTAÇÃO II'}]},
+            {id:'CCMP0016-MB-MEC', department:'Eng. Mecânica', name:'ALGORITMO E PROGRAMAÇÃO (Prática)', turma:'MB', professor:'NÃO INFORMADO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'COMPUTAÇÃO II'}]},
+            {id:'MATM0119-MX-MEC', department:'Eng. Mecânica', name:'CÁLCULO DIFERENCIAL E INTEGRAL I', turma:'MX', professor:'SERGIO FLOQUET SALES', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 03'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 03'}]},
+            {id:'MATM0120-M2', department:'Eng. Mecânica', name:'CÁLCULO DIFERENCIAL E INTEGRAL II', turma:'M2', professor:'ALEXANDRE RAMALHO SILVA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 18'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 18'}]},
+            {id:'MATM0121-M3', department:'Eng. Mecânica', name:'CÁLCULO DIFERENCIAL E INTEGRAL III', turma:'M3', professor:'EDSON LEITE ARAUJO', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 16'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 16'}]},
+            {id:'CIEN0004-M3', department:'Eng. Mecânica', name:'CIÊNCIA E TECNOLOGIA DOS MATERIAIS', turma:'M3', professor:'ERLON RABELO CORDEIRO', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 16'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 16'}]},
+            {id:'MECN0012-MA', department:'Eng. Mecânica', name:'DESENHO DE MÁQUINAS', turma:'MA', professor:'JOSE BISMARK DE MEDEIROS', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00'], sala:'SALA 01'}]},
+            {id:'MECN0012-MB', department:'Eng. Mecânica', name:'DESENHO DE MÁQUINAS', turma:'MB', professor:'ALAN CHRISTIE DA SILVA DANTAS', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00'], sala:'SALA 03'}]},
+            {id:'MECN0045-M9', department:'Eng. Mecânica', name:'ECONOMIA PARA ENGENHARIA', turma:'M9', professor:'ALAN FRANCISCO CARVALHO PEREIRA', slots:[{dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 24'}]},
+            {id:'MECN0032-M7', department:'Eng. Mecânica', name:'ELEMENTOS DE MÁQUINAS II', turma:'M7', professor:'JOSE BISMARK DE MEDEIROS', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 23'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 23'}]},
+            {id:'ELET0028-M5', department:'Eng. Mecânica', name:'ELETROTÉCNICA', turma:'M5', professor:'ANTONIO DE ALMEIDA FERNANDES', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 17'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 17'}]},
+            {id:'MECN0053-M9', department:'Eng. Mecânica', name:'ESTAGIO CURRICULAR', turma:'M9', professor:'EDNA SANTIAGO BENTA', slots:[{dia:'SAB', horario:['07:00-08:00'], sala:'OFICINA MECÂNICA'}]},
+            {id:'PRBE0013-M3', department:'Eng. Mecânica', name:'ESTATÍSTICA BÁSICA', turma:'M3', professor:'MARLON DA SILVA GARRIDO', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 16'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 16'}]},
+            {id:'FISC0037-MX-MEC', department:'Eng. Mecânica', name:'FÍSICA BÁSICA', turma:'MX', professor:'MARCIO PAZETTI', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 11'}]},
+            {id:'FISC0099-3M', department:'Eng. Mecânica', name:'FÍSICA EXPERIMENTAL A', turma:'3M', professor:'PAULO GUSTAVO SERAFIM DE CARVALHO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'FÍSICA EXPERIMENTAL I'}]},
+            {id:'FISC0099-M3', department:'Eng. Mecânica', name:'FÍSICA EXPERIMENTAL A', turma:'M3', professor:'MARIELE REGINA PINHEIRO GONÇALVES', slots:[{dia:'QUI', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'FÍSICA EXPERIMENTAL I'}]},
+            {id:'FISC0036-M2', department:'Eng. Mecânica', name:'FÍSICA TEÓRICA I', turma:'M2', professor:'NIKIFOR RAKOV GOMEZ', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'NT 01'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'NT 01'}]},
+            {id:'FISC0038-M3', department:'Eng. Mecânica', name:'FÍSICA TEÓRICA II', turma:'M3', professor:'ANIBAL LIVRAMENTO DA SILVA NETTO', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 03'}, {dia:'SEX', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 03'}]},
+            {id:'FISC0039-M4', department:'Eng. Mecânica', name:'FÍSICA TEÓRICA III', turma:'M4', professor:'HELINANDO PEQUENO DE OLIVEIRA', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 18'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 18'}]},
+            {id:'DPRJ0013-MA-MEC', department:'Eng. Mecânica', name:'GEOMETRIA DESCRITIVA', turma:'MA', professor:'BEATRIZ LEMOS CAVALCANTE DE CARVALHO SANTIAGO', slots:[{dia:'TER', horario:['13:00-14:00', '14:00-15:00', '15:00-16:00'], sala:'EXPRESSÃO GRÁFICA I'}]},
+            {id:'DPRJ0013-MB-MEC', department:'Eng. Mecânica', name:'GEOMETRIA DESCRITIVA', turma:'MB', professor:'BEATRIZ LEMOS CAVALCANTE DE CARVALHO SANTIAGO', slots:[{dia:'SEX', horario:['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala:'EXPRESSÃO GRÁFICA I'}]},
+            {id:'ELET0048-M9', department:'Eng. Mecânica', name:'HIGIENE E SEGURANÇA DO TRABALHO', turma:'M9', professor:'TARGIELI DOS SANTOS SOARES', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala:'SALA 24'}]},
+            {id:'MECN0042-9M', department:'Eng. Mecânica', name:'INSTRUMENTAÇÃO INDUSTRIAL', turma:'9M', professor:'MARCOS ANTONIO DA SILVA IRMAO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00', '18:00-18:50'], sala:'SALA 24'}]},
+            {id:'MECN0042-M9', department:'Eng. Mecânica', name:'INSTRUMENTAÇÃO INDUSTRIAL', turma:'M9', professor:'MARCOS ANTONIO DA SILVA IRMAO', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala:'SALA 24'}]},
+            {id:'MECN0031-M7', department:'Eng. Mecânica', name:'MÁQUINAS DE FLUXO', turma:'M7', professor:'JOSÉ PEREIRA ALENCAR JUNIOR', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 23'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 23'}]},
+            {id:'MECN0041-MX', department:'Eng. Mecânica', name:'MÁQUINAS TÉRMICAS', turma:'MX', professor:'JOSÉ DE CASTRO SILVA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 07'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 07'}]},
+            {id:'MECN0024-M5', department:'Eng. Mecânica', name:'MATERIAIS DE CONSTRUÇÃO MECÂNICA', turma:'M5', professor:'HENRIQUE TAKASHI IDOGAVA', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 18'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 18'}]},
+            {id:'MECN0019-M5', department:'Eng. Mecânica', name:'MECÂNICA DOS FLUIDOS I', turma:'M5', professor:'EDNA SANTIAGO BENTA', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 18'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 18'}]},
+            {id:'MECN0017-M3', department:'Eng. Mecânica', name:'MECÂNICA DOS SÓLIDOS I - ESTÁTICA', turma:'M3', professor:'JOÃO PEDRO DA SILVA NETO', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 16'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 16'}]},
+            {id:'CIEN0003-M2', department:'Eng. Mecânica', name:'METODOLOGIA DA PESQUISA', turma:'M2', professor:'CAMILA COELHO GUIMARÃES', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 19'}]},
+            {id:'PROD0069-M2', department:'Eng. Mecânica', name:'METROLOGIA', turma:'M2', professor:'GUNTHER JOSUÁ COSTA', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 01'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 01'}]},
+            {id:'MECN0050-M9', department:'Eng. Mecânica', name:'NÚCLEO TEMÁTICO - PROJETO E DESENVOLVIMENTO DE SOLUÇÕES TECNOLÓGICAS', turma:'M9', professor:'VARIOS', slots:[{dia:'SAB', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SALA 07'}]},
+            {id:'MECN0028-M7', department:'Eng. Mecânica', name:'PROCESSOS DE FABRICAÇÃO I', turma:'M7', professor:'HENRIQUE TAKASHI IDOGAVA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 23'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 23'}]},
+            {id:'QUIM0018-MX-MEC', department:'Eng. Mecânica', name:'QUÍMICA GERAL PRÁTICA', turma:'MX', professor:'ANDRÉA DE VASCONCELOS FERRAZ', slots:[{dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'QUIM0018-TX-MEC', department:'Eng. Mecânica', name:'QUÍMICA GERAL PRÁTICA', turma:'TX', professor:'LUCIMAR PACHECO GOMES DA ROCHA', slots:[{dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'QUIM0017-MX-MEC', department:'Eng. Mecânica', name:'QUÍMICA GERAL TEÓRICA', turma:'MX', professor:'FERNANDA SANTOS CARVALHO DOS ANJOS', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 11'}]},
+            {id:'MECN0015-MX-MEC', department:'Eng. Mecânica', name:'RESISTÊNCIA DOS MATERIAIS I', turma:'MX', professor:'JOÃO CARLOS SEDRAZ SILVA', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 07'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 07'}]},
+            {id:'CSOC0004-M9', department:'Eng. Mecânica', name:'SOCIOLOGIA', turma:'M9', professor:'DIOGO GRIECO DE ALBUQUERQUE LIMA', slots:[{dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 24'}]},
+            {id:'MECN0049-MX', department:'Eng. Mecânica', name:'TECNOLOGIA CNC', turma:'MX', professor:'ERLON RABELO CORDEIRO', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SALA 07'}]},
+            {id:'MECN0020-M5', department:'Eng. Mecânica', name:'TERMODINÂMICA BÁSICA', turma:'M5', professor:'LUIZ MARIANO PEREIRA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'NT 02'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'NT 02'}]},
+            {id:'MECN0067-M7', department:'Eng. Mecânica', name:'TÓPICOS ESPECIAIS EM TERMODINÂMICA', turma:'M7', professor:'LUIZ MARIANO PEREIRA', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'METROLOGIA'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'METROLOGIA'}]},
+            {id:'MECN0063-M9', department:'Eng. Mecânica', name:'TÓPICOS ESPECIAIS EM VIBRAÇÕES', turma:'M9', professor:'MARCOS ANTONIO DA SILVA IRMAO', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00', '14:00-15:00', '15:00-16:00'], sala:'SALA 24'}]},
+            {id:'MECN0044-M0', department:'Eng. Mecânica', name:'TRABALHO DE CONCLUSÃO DE CURSO', turma:'M0', professor:'ERLON RABELO CORDEIRO', slots:[{dia:'SAB', horario:['21:20-22:10'], sala:'OFICINA MECÂNICA'}]},
+            {id:'MECN0034-M7', department:'Eng. Mecânica', name:'TRANSFERÊNCIA DE CALOR II', turma:'M7', professor:'JOSÉ PEREIRA ALENCAR JUNIOR', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 23'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 23'}]},
+            {id:'MECN0039-MX', department:'Eng. Mecânica', name:'VIBRAÇÕES EM SISTEMAS MECÂNICOS', turma:'MX', professor:'JOSE BISMARK DE MEDEIROS', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 24'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 24'}]},
+
             // Eng. Civil
-            { id: 'CIVL0042-18-CIVIL', department: 'Eng. Civil', name: 'ADMINISTRAÇÃO E CUSTOS DA CONSTRUÇÃO', turma: '18', professor: 'PAULO CÉSAR RODRIGUES DE LIMA JÚNIOR', slots: [{ dia: 'TER', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 05' }, { dia: 'QUI', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 05' }] },
-            { id: 'CIVL0032-16-CIVIL', department: 'Eng. Civil', name: 'ANÁLISE ESTRUTURAL I-ISOSTÁTICA', turma: '16', professor: 'JUDAS TADEU GOMES DE SOUSA', slots: [{ dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 04' }, { dia: 'SEX', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 04' }] },
-            { id: 'CIVL0047-18-CIVIL', department: 'Eng. Civil', name: 'ESTRUTURAS DE CONCRETO ARMADO II', turma: '18', professor: 'NAILDE DE AMORIM COELHO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 05' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 05' }] },
-            { id: 'CIVL0065-TX-CIVIL', department: 'Eng. Civil', name: 'FUNDAÇÕES', turma: 'TX', professor: 'GERSON MARQUES DOS SANTOS', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 02' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 02' }] },
-            { id: 'MATM0117-11-CIVIL', department: 'Eng. Civil', name: 'GEOMETRIA ANALÍTICA', turma: '11', professor: 'JOAO ALVES SILVA JUNIOR', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 13' }, { dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 13' }] },
-            { id: 'CIVL0045-18-CIVIL', department: 'Eng. Civil', name: 'SANEAMENTO I', turma: '18', professor: 'SYLVIA PAES FARIAS DE OMENA', slots: [{ dia: 'SEX', horario: ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala: 'SALA 05' }] },
-            
+            {id:'CIVL0042-18', department:'Eng. Civil', name:'ADMINISTRAÇÃO E CUSTOS DA CONSTRUÇÃO', turma:'18', professor:'PAULO CÉSAR RODRIGUES DE LIMA JÚNIOR', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 05'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 05'}]},
+            {id:'CCMP0016-1A-CIVIL', department:'Eng. Civil', name:'ALGORITMO E PROGRAMAÇÃO (Prática)', turma:'1A', professor:'MARIO GODOY NETO', slots:[{dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'COMPUTAÇÃO I'}]},
+            {id:'CCMP0016-1B-CIVIL', department:'Eng. Civil', name:'ALGORITMO E PROGRAMAÇÃO (Prática)', turma:'1B', professor:'MARIO GODOY NETO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'COMPUTAÇÃO I'}]},
+            {id:'CCMP0016-X1-CIVIL', department:'Eng. Civil', name:'ALGORITMO E PROGRAMAÇÃO', turma:'X1', professor:'MARIO GODOY NETO', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'COMPUTAÇÃO I'}]},
+            {id:'CIVL0032-16', department:'Eng. Civil', name:'ANÁLISE ESTRUTURAL I - ISOSTÁTICA', turma:'16', professor:'JUDAS TADEU GOMES DE SOUSA', slots:[{dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 04'}, {dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 04'}]},
+            {id:'CIVL0062-TX', department:'Eng. Civil', name:'BARRAGENS', turma:'TX', professor:'RALINY MOTA DE SOUZA FARIAS', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 02'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 02'}]},
+            {id:'MATM0119-11-CIVIL', department:'Eng. Civil', name:'CÁLCULO DIFERENCIAL E INTEGRAL I', turma:'11', professor:'ALISON MARCELO VAN DER LAAN MELO', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 13'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 13'}]},
+            {id:'MATM0121-13-CIVIL', department:'Eng. Civil', name:'CÁLCULO DIFERENCIAL E INTEGRAL III', turma:'13', professor:'ALISON MARCELO VAN DER LAAN MELO', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 10'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 10'}]},
+            {id:'LING0002-11', department:'Eng. Civil', name:'COMUNICAÇÃO E EXPRESSÃO', turma:'11', professor:'NÃO INFORMADO', slots:[{dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 03'}]},
+            {id:'CIVL0015-1A', department:'Eng. Civil', name:'ELEMENTOS DE ARQUITETURA', turma:'1A', professor:'SÍLVIA PATRÍCIA DE OLIVEIRA SOUZA COÊLHO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'EXPRESSÃO GRÁFICA I'}]},
+            {id:'CIVL0015-1B', department:'Eng. Civil', name:'ELEMENTOS DE ARQUITETURA', turma:'1B', professor:'SERGIO MARCELINO DA MOTTA LOPES', slots:[{dia:'SEX', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'EXPRESSÃO GRÁFICA I'}]},
+            {id:'CIVL0055-10', department:'Eng. Civil', name:'ESTÁGIO', turma:'10', professor:'PAULO CÉSAR RODRIGUES DE LIMA JÚNIOR', slots:[{dia:'SAB', horario:['12:00-13:00'], sala:'SALA 11'}]},
+            {id:'CIVL0050-18', department:'Eng. Civil', name:'ESTRADAS I', turma:'18', professor:'RAFAEL AMORIM VIANA DE MOURA', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 05'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 05'}]},
+            {id:'CIVL0048-18', department:'Eng. Civil', name:'ESTRUTURAS DE AÇO I', turma:'18', professor:'ANDERSON HENRIQUE BARBOSA', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 05'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 05'}]},
+            {id:'CIVL0047-18', department:'Eng. Civil', name:'ESTRUTURAS DE CONCRETO ARMADO II', turma:'18', professor:'NAILDE DE AMORIM COELHO', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 05'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 05'}]},
+            {id:'FISC0037-11', department:'Eng. Civil', name:'FÍSICA BÁSICA', turma:'11', professor:'JADERSON DE ARAUJO BARROS BARBOSA', slots:[{dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 12'}]},
+            {id:'FISC0099-13', department:'Eng. Civil', name:'FÍSICA EXPERIMENTAL A', turma:'13', professor:'MARIELE REGINA PINHEIRO GONÇALVES', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'FÍSICA EXPERIMENTAL I'}]},
+            {id:'FISC0099-31', department:'Eng. Civil', name:'FÍSICA EXPERIMENTAL A', turma:'31', professor:'MILITAO VIEIRA FIGUEREDO', slots:[{dia:'QUI', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'FÍSICA EXPERIMENTAL I'}]},
+            {id:'FISC0042-14', department:'Eng. Civil', name:'FÍSICA EXPERIMENTAL III', turma:'14', professor:'RAQUEL ALINE PESSOA OLIVEIRA', slots:[{dia:'SEX', horario:['14:00-15:00', '15:00-16:00'], sala:'FÍSICA EXPERIMENTAL II'}]},
+            {id:'FISC0042-41', department:'Eng. Civil', name:'FÍSICA EXPERIMENTAL III', turma:'41', professor:'RAQUEL ALINE PESSOA OLIVEIRA', slots:[{dia:'SEX', horario:['16:00-17:00', '17:00-18:00'], sala:'FÍSICA EXPERIMENTAL II'}]},
+            {id:'FISC0036-TX-CIVIL', department:'Eng. Civil', name:'FÍSICA TEÓRICA I', turma:'TX', professor:'KÉZIA BRASILINO DE SOUZA', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 18'}, {dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 18'}]},
+            {id:'FISC0038-13', department:'Eng. Civil', name:'FÍSICA TEÓRICA II', turma:'13', professor:'ANIBAL LIVRAMENTO DA SILVA NETTO', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'NT 03'}, {dia:'SEX', horario:['08:00-09:00', '09:00-10:00'], sala:'NT 03'}]},
+            {id:'CIVL0065-TX', department:'Eng. Civil', name:'FUNDAÇÕES', turma:'TX', professor:'GERSON MARQUES DOS SANTOS', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 02'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 02'}]},
+            {id:'AGRI0013-16', department:'Eng. Civil', name:'GEOLOGIA APLICADA A SOLOS', turma:'16', professor:'CARMEM SUEZE SILVA MIRANDA', slots:[{dia:'QUI', horario:['07:00-08:00', '08:00-09:00', '09:00-10:00'], sala:'SALA 04'}]},
+            {id:'MATM0117-11-CIVIL', department:'Eng. Civil', name:'GEOMETRIA ANALÍTICA', turma:'11', professor:'JOAO ALVES SILVA JUNIOR', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 13'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 13'}]},
+            {id:'CIVL0059-TX', department:'Eng. Civil', name:'GEOTECNIA AMBIENTAL', turma:'TX', professor:'RALINY MOTA DE SOUZA FARIAS', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SALA 02'}]},
+            {id:'CIVL0031-16', department:'Eng. Civil', name:'HIDRÁULICA', turma:'16', professor:'PEDRO ROBINSON FERNANDES DE MEDEIROS', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 04'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 04'}]},
+            {id:'ECON0007-14', department:'Eng. Civil', name:'INTRODUÇÃO À ECONOMIA', turma:'14', professor:'ALAN FRANCISCO CARVALHO PEREIRA', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 13'}]},
+            {id:'CIVL0001-11', department:'Eng. Civil', name:'INTRODUÇÃO A ENGENHARIA CIVIL', turma:'11', professor:'WAGNER CARVALHO SANTIAGO', slots:[{dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 03'}]},
+            {id:'CIVL0019-4A', department:'Eng. Civil', name:'MATERIAIS DE CONSTRUÇÃO I', turma:'4A', professor:'JOSE GETULIO GOMES DE SOUSA', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'MATERIAIS DE CONSTRUÇÃO'}, {dia:'TER', horario:['07:00-08:00', '08:00-09:00', '09:00-10:00'], sala:'MATERIAIS DE CONSTRUÇÃO'}]},
+            {id:'CIVL0019-4B', department:'Eng. Civil', name:'MATERIAIS DE CONSTRUÇÃO I', turma:'4B', professor:'JOSE GETULIO GOMES DE SOUSA', slots:[{dia:'QUI', horario:['07:00-08:00', '08:00-09:00', '09:00-10:00'], sala:'MATERIAIS DE CONSTRUÇÃO'}, {dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'MATERIAIS DE CONSTRUÇÃO'}]},
+            {id:'MECN0017-14-CIVIL', department:'Eng. Civil', name:'MECÂNICA DOS SÓLIDOS I - ESTÁTICA', turma:'14', professor:'JOÃO PEDRO DA SILVA NETO', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'NT 03'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'NT 03'}]},
+            {id:'CIVL0035-16', department:'Eng. Civil', name:'MECÂNICA DOS SÓLIDOS II - CINEMÁTICA', turma:'16', professor:'JUDAS TADEU GOMES DE SOUSA', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 04'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 04'}]},
+            {id:'CIVL0044-18', department:'Eng. Civil', name:'MECÂNICA DOS SOLOS II', turma:'18', professor:'GERSON MARQUES DOS SANTOS', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 05'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 05'}]},
+            {id:'CIEN0003-11-CIVIL', department:'Eng. Civil', name:'METODOLOGIA DA PESQUISA', turma:'11', professor:'WAGNER CARVALHO SANTIAGO', slots:[{dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 03'}]},
+            {id:'CIVL0108-TX', department:'Eng. Civil', name:'ORÇAMENTAÇÃO PARA CONSTRUÇÕES CIVIS', turma:'TX', professor:'PAULO CÉSAR RODRIGUES DE LIMA JÚNIOR', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 11'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 11'}]},
+            {id:'QUIM0018-1A-CIVIL', department:'Eng. Civil', name:'QUÍMICA GERAL PRÁTICA', turma:'1A', professor:'ADRIANA MORENO COSTA SILVA', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'QUIM0018-1B-CIVIL', department:'Eng. Civil', name:'QUÍMICA GERAL PRÁTICA', turma:'1B', professor:'FERNANDA SANTOS CARVALHO DOS ANJOS', slots:[{dia:'SEX', horario:['14:00-15:00', '15:00-16:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'QUIM0018-1C-CIVIL', department:'Eng. Civil', name:'QUÍMICA GERAL PRÁTICA', turma:'1C', professor:'FERNANDA SANTOS CARVALHO DOS ANJOS', slots:[{dia:'SEX', horario:['16:00-17:00', '17:00-18:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'QUIM0017-11-CIVIL', department:'Eng. Civil', name:'QUÍMICA GERAL TEÓRICA', turma:'11', professor:'ANDRÉA DE VASCONCELOS FERRAZ', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 13'}]},
+            {id:'MECN0018-16', department:'Eng. Civil', name:'RESISTENCIA DOS MATERIAIS II', turma:'16', professor:'NAILDE DE AMORIM COELHO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 04'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 04'}]},
+            {id:'CIVL0045-18', department:'Eng. Civil', name:'SANEAMENTO I', turma:'18', professor:'SYLVIA PAES FARIAS DE OMENA', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SALA 05'}]},
+            {id:'CIVL0052-TX', department:'Eng. Civil', name:'SISTEMAS DOS TRANSPORTES', turma:'TX', professor:'RAFAEL AMORIM VIANA DE MOURA', slots:[{dia:'SEG', horario:['18:00-18:50', '18:50-19:40'], sala:'SALA 02'}, {dia:'QUA', horario:['18:00-18:50', '18:50-19:40'], sala:'SALA 02'}]},
+            {id:'CIVL0038-TX', department:'Eng. Civil', name:'TECNOLOGIA DAS CONSTRUÇÕES', turma:'TX', professor:'WAGNER CARVALHO SANTIAGO', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 02'}, {dia:'QUI', horario:['13:00-14:00', '14:00-15:00', '15:00-16:00'], sala:'SALA 02'}]},
+            {id:'CIVL0053-10', department:'Eng. Civil', name:'TRABALHO DE CONCLUSÃO DE CURSO I', turma:'10', professor:'JOSE GETULIO GOMES DE SOUSA', slots:[{dia:'SAB', horario:['13:00-14:00'], sala:'SALA 01'}]},
+            {id:'CIVL0054-10', department:'Eng. Civil', name:'TRABALHO DE CONCLUSÃO DE CURSO II', turma:'10', professor:'JOSE GETULIO GOMES DE SOUSA', slots:[{dia:'SAB', horario:['14:00-15:00'], sala:'SALA 01'}]},
+
             // Eng. de Produção
-            { id: 'PROD0060-P9-PROD', department: 'Eng. de Produção', name: 'AGRONEGÓCIO', turma: 'P9', professor: 'JOSE LUIZ MOREIRA DE CARVALHO', slots: [{ dia: 'TER', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 8' }, { dia: 'QUI', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 06' }] },
-            { id: 'MATM0118-P2-PROD', department: 'Eng. de Produção', name: 'ALGEBRA LINEAR', turma: 'P2', professor: 'BETO ROBER BAUTISTA SAAVEDRA', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 14' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 14' }] },
-            { id: 'PROD0038-P5-PROD', department: 'Eng. de Produção', name: 'ANÁLISE DE INVESTIMENTOS', turma: 'P5', professor: 'ALAN FRANCISCO CARVALHO PEREIRA', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 04' }, { dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 9' }] },
-            { id: 'MATM0123-P5-PROD', department: 'Eng. de Produção', name: 'CÁLCULO NUMÉRICO', turma: 'P5', professor: 'SERGIO FLOQUET SALES', slots: [{ dia: 'TER', horario: ['16:00-17:00', '17:00-18:00'], sala: 'NT 02' }, { dia: 'QUI', horario: ['16:00-17:00', '17:00-18:00'], sala: 'NT 02' }] },
-            { id: 'PROD0052-P7-PROD', department: 'Eng. de Produção', name: 'ENGENHARIA DO PRODUTO', turma: 'P7', professor: 'GUNTHER JOSUA COSTA', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'NT 01' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'NT 01' }] },
-            { id: 'MATM0117-PX-PROD', department: 'Eng. de Produção', name: 'GEOMETRIA ANALÍTICA', turma: 'PX', professor: 'JOAO ALVES SILVA JUNIOR', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'NT 01' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'NT 01' }] },
-            { id: 'PROD0053-P7-PROD', department: 'Eng. de Produção', name: 'GESTÃO DE SERVIÇOS', turma: 'P7', professor: 'ANA CRISTINA GONÇALVES CASTRO SILVA', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 28' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 28' }] },
-            { id: 'PROD0039-P5-PROD', department: 'Eng. de Produção', name: 'PESQUISA OPERACIONAL I', turma: 'P5', professor: 'ANTONIO PIRES CRISOSTOMO', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 06' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 06' }] },
+            {id:'PROD0060-P9', department:'Eng. de Produção', name:'AGRONEGÓCIO', turma:'P9', professor:'JOSE LUIZ MOREIRA DE CARVALHO', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 8'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 06'}]},
+            {id:'MATM0118-P2', department:'Eng. de Produção', name:'ÁLGEBRA LINEAR', turma:'P2', professor:'BETO ROBER BAUTISTA SAAVEDRA', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 14'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 14'}]},
+            {id:'PROD0038-P5', department:'Eng. de Produção', name:'ANÁLISE DE INVESTIMENTOS', turma:'P5', professor:'ALAN FRANCISCO CARVALHO PEREIRA', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 04'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 9'}]},
+            {id:'MATM0119-PX-PROD', department:'Eng. de Produção', name:'CÁLCULO DIFERENCIAL E INTEGRAL I', turma:'PX', professor:'LINO MARCOS DA SILVA', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 02'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 02'}]},
+            {id:'MATM0119-TX-PROD', department:'Eng. de Produção', name:'CÁLCULO DIFERENCIAL E INTEGRAL I', turma:'TX', professor:'CARLOS ANTONIO FREITAS DA SILVA', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 9'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 9'}]},
+            {id:'MATM0120-P2', department:'Eng. de Produção', name:'CÁLCULO DIFERENCIAL E INTEGRAL II', turma:'P2', professor:'FABIO HENRIQUE DE CARVALHO', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'NT 01'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'NT 01'}]},
+            {id:'MATM0121-P3', department:'Eng. de Produção', name:'CÁLCULO DIFERENCIAL E INTEGRAL III', turma:'P3', professor:'FABIO HENRIQUE DE CARVALHO', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 17'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 17'}]},
+            {id:'MATM0123-P5', department:'Eng. de Produção', name:'CÁLCULO NUMÉRICO', turma:'P5', professor:'SERGIO FLOQUET SALES', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'NT 02'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'NT 02'}]},
+            {id:'CIEN0004-PX', department:'Eng. de Produção', name:'CIÊNCIA E TECNOLOGIA DOS MATERIAIS', turma:'PX', professor:'CAMILA COELHO GUIMARÃES', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 10'}, {dia:'QUA', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 11'}]},
+            {id:'LING0002-P2', department:'Eng. de Produção', name:'COMUNICAÇÃO E EXPRESSÃO', turma:'P2', professor:'NÃO INFORMADO', slots:[{dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 06'}]},
+            {id:'PROD0222-P2', department:'Eng. de Produção', name:'CONTABILIDADE APLICADA À ENGENHARIA', turma:'P2', professor:'ALAN FRANCISCO CARVALHO PEREIRA', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 06'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 06'}]},
+            {id:'PROD0081-PX', department:'Eng. de Produção', name:'DECISÃO MULTICRITÉRIO', turma:'PX', professor:'THIAGO MAGALHÃES AMARAL', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SIMULAÇÃO E PRÁTICAS EMPRESARIAIS I'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SIMULAÇÃO E PRÁTICAS EMPRESARIAIS I'}]},
+            {id:'DPRJ0012-PA-PROD', department:'Eng. de Produção', name:'DESENHO TÉCNICO - 60', turma:'PA', professor:'JOSEPHANA NERI TAVARES DE MELO VIEIRA', slots:[{dia:'QUA', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'EXPRESSÃO GRÁFICA I'}]},
+            {id:'DPRJ0012-PB-PROD', department:'Eng. de Produção', name:'DESENHO TÉCNICO - 60', turma:'PB', professor:'FABIO JOSE DE MATOS BARBOSA', slots:[{dia:'QUA', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'EXPRESSÃO GRÁFICA II'}]},
+            {id:'PROD0110-P2', department:'Eng. de Produção', name:'ECONOMIA', turma:'P2', professor:'RENNAN KERTLLY DE MEDEIROS', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala:'SALA 15'}]},
+            {id:'PROD0033-2P', department:'Eng. de Produção', name:'ECONOMIA-60', turma:'2P', professor:'RENNAN KERTLLY DE MEDEIROS', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 8'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 8'}]},
+            {id:'PROD0104-P3', department:'Eng. de Produção', name:'ENGENHARIA DAS FINANÇAS', turma:'P3', professor:'RENNAN KERTLLY DE MEDEIROS', slots:[{dia:'TER', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 07'}, {dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 9'}]},
+            {id:'PROD0052-P7', department:'Eng. de Produção', name:'ENGENHARIA DO PRODUTO', turma:'P7', professor:'GUNTHER JOSUÁ COSTA', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'NT 01'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'NT 01'}]},
+            {id:'PROD0064-P9', department:'Eng. de Produção', name:'ESTÁGIO', turma:'P9', professor:'JOSE LUIZ MOREIRA DE CARVALHO', slots:[{dia:'SAB', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 06'}]},
+            {id:'PRBE0014-P3', department:'Eng. de Produção', name:'ESTATÍSTICA APLICADA À ENGENHARIA', turma:'P3', professor:'PAULO JOSÉ PEREIRA', slots:[{dia:'SEG', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 07'}, {dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 10'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'COMPUTAÇÃO II'}]},
+            {id:'PROD0058-P7', department:'Eng. de Produção', name:'ÉTICA E RESPONSABILIDADE SOCIAL', turma:'P7', professor:'FABIANA GOMES DOS PASSOS', slots:[{dia:'QUA', horario:['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala:'SALA 06'}]},
+            {id:'PROD0109-P2', department:'Eng. de Produção', name:'EVOLUÇÃO DAS TÉCNICAS DE GESTÃO E PRODUÇÃO', turma:'P2', professor:'PEDRO VIEIRA SOUZA SANTOS', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 06'}]},
+            {id:'MECN0023-P5', department:'Eng. de Produção', name:'FENÔMENOS DE TRANSPORTE', turma:'P5', professor:'EDNA SANTIAGO BENTA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 19'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 05'}]},
+            {id:'PROD0071-PX', department:'Eng. de Produção', name:'FERRAMENTAS COMPUTACIONAIS PARA ENGENHARIA DE PRODUÇÃO', turma:'PX', professor:'THIAGO MAGALHÃES AMARAL', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'SIMULAÇÃO E PRÁTICAS EMPRESARIAIS I'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SIMULAÇÃO E PRÁTICAS EMPRESARIAIS I'}]},
+            {id:'FISC0037-PX-PROD', department:'Eng. de Produção', name:'FÍSICA BÁSICA', turma:'PX', professor:'MARCIO PAZETTI', slots:[{dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SALA 11'}]},
+            {id:'FISC0099-3P', department:'Eng. de Produção', name:'FÍSICA EXPERIMENTAL A', turma:'3P', professor:'PAULO GUSTAVO SERAFIM DE CARVALHO', slots:[{dia:'SEX', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'FÍSICA EXPERIMENTAL I'}]},
+            {id:'FISC0099-P3', department:'Eng. de Produção', name:'FÍSICA EXPERIMENTAL A', turma:'P3', professor:'NIKIFOR RAKOV GOMEZ', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'FÍSICA EXPERIMENTAL I'}]},
+            {id:'FISC0036-P2', department:'Eng. de Produção', name:'FÍSICA TEÓRICA I', turma:'P2', professor:'WAGNER DE ASSIS CANGUSSU PASSOS', slots:[{dia:'TER', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 02'}, {dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 02'}]},
+            {id:'FISC0038-P3', department:'Eng. de Produção', name:'FÍSICA TEÓRICA II', turma:'P3', professor:'JADERSON DE ARAUJO BARROS BARBOSA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 17'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 17'}]},
+            {id:'MATM0117-PX-PROD', department:'Eng. de Produção', name:'GEOMETRIA ANALÍTICA', turma:'PX', professor:'JOAO ALVES SILVA JUNIOR', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 01'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'NT 01'}]},
+            {id:'PROD0053-P7', department:'Eng. de Produção', name:'GESTÃO DE SERVIÇOS', turma:'P7', professor:'ANA CRISTINA GONÇALVES CASTRO SILVA', slots:[{dia:'TER', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 28'}, {dia:'QUI', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 28'}]},
+            {id:'ELET0048-P5', department:'Eng. de Produção', name:'HIGIENE E SEGURANÇA DO TRABALHO', turma:'P5', professor:'TARGIELI DOS SANTOS SOARES', slots:[{dia:'QUA', horario:['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala:'SALA 19'}]},
+            {id:'PROD0105-P7', department:'Eng. de Produção', name:'LOGÍSTICA DE SUPRIMENTOS', turma:'P7', professor:'JOSE LUIZ MOREIRA DE CARVALHO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 01'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 01'}]},
+            {id:'PROD0043-P5', department:'Eng. de Produção', name:'MARKETING APLICADO À ENGENHARIA', turma:'P5', professor:'JOSE LUIZ MOREIRA DE CARVALHO', slots:[{dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 06'}]},
+            {id:'CIEN0005-P7', department:'Eng. de Produção', name:'MEIO AMBIENTE E DESENVOLVIMENTO SUSTENTÁVEL', turma:'P7', professor:'VIVIANNI MARQUES LEITE DOS SANTOS', slots:[{dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 06'}]},
+            {id:'PROD0088-PX', department:'Eng. de Produção', name:'MÉTODOS QUANTITATIVOS APLICADOS À ENGENHARIA DE PRODUÇÃO', turma:'PX', professor:'PAULO JOSÉ PEREIRA', slots:[{dia:'SEG', horario:['16:00-17:00', '17:00-18:00'], sala:'SIMULAÇÃO E PRÁTICAS EMPRESARIAIS I'}, {dia:'QUA', horario:['16:00-17:00', '17:00-18:00'], sala:'SIMULAÇÃO E PRÁTICAS EMPRESARIAIS I'}]},
+            {id:'PROD0039-P5', department:'Eng. de Produção', name:'PESQUISA OPERACIONAL I', turma:'P5', professor:'ANTONIO PIRES CRISOSTOMO', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 06'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 06'}]},
+            {id:'PROD0048-P7', department:'Eng. de Produção', name:'PLANEJAMENTO E CONTROLE DA PRODUÇÃO II', turma:'P7', professor:'ANGELO ANTONIO MACEDO LEITE', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 03'}, {dia:'QUI', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 03'}]},
+            {id:'PROD0057-PA-PROD', department:'Eng. de Produção', name:'PROCESSOS INDUSTRIAIS (Prática)', turma:'PA', professor:'VIVIANNI MARQUES LEITE DOS SANTOS', slots:[{dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'PROCESSOS QUÍMICOS'}]},
+            {id:'PROD0057-PB-PROD', department:'Eng. de Produção', name:'PROCESSOS INDUSTRIAIS (Prática)', turma:'PB', professor:'VIVIANNI MARQUES LEITE DOS SANTOS', slots:[{dia:'SEX', horario:['14:00-15:00', '15:00-16:00'], sala:'PROCESSOS QUÍMICOS'}]},
+            {id:'PROD0057-PX-PROD', department:'Eng. de Produção', name:'PROCESSOS INDUSTRIAIS', turma:'PX', professor:'VIVIANNI MARQUES LEITE DOS SANTOS', slots:[{dia:'SEX', horario:['08:00-09:00', '09:00-10:00'], sala:'PROCESSOS QUÍMICOS'}]},
+            {id:'PROD0106-P9', department:'Eng. de Produção', name:'PROJETO DE FÁBRICA', turma:'P9', professor:'ANA CRISTINA GONÇALVES CASTRO SILVA', slots:[{dia:'QUA', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SIMULAÇÃO E PRÁTICAS EMPRESARIAIS I'}]},
+            {id:'PROD0063-P9', department:'Eng. de Produção', name:'PROJETO DE TFC', turma:'P9', professor:'FABIANA GOMES DOS PASSOS', slots:[{dia:'SEG', horario:['10:00-11:00', '11:00-12:00'], sala:'SALA 03'}]},
+            {id:'PROD0062-P9', department:'Eng. de Produção', name:'PSICOLOGIA ORGANIZACIONAL', turma:'P9', professor:'NÃO INFORMADO', slots:[{dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 06'}]},
+            {id:'QUIM0018-PX-PROD', department:'Eng. de Produção', name:'QUÍMICA GERAL PRÁTICA', turma:'PX', professor:'LUCIMAR PACHECO GOMES DA ROCHA', slots:[{dia:'QUI', horario:['14:00-15:00', '15:00-16:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'QUIM0018-TX-PROD', department:'Eng. de Produção', name:'QUÍMICA GERAL PRÁTICA', turma:'TX', professor:'LUCIMAR PACHECO GOMES DA ROCHA', slots:[{dia:'QUI', horario:['16:00-17:00', '17:00-18:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'QUIM0018-XP', department:'Eng. de Produção', name:'QUÍMICA GERAL PRÁTICA', turma:'XP', professor:'FERNANDA SANTOS CARVALHO DOS ANJOS', slots:[{dia:'SEX', horario:['10:00-11:00', '11:00-12:00'], sala:'QUÍMICA GERAL'}]},
+            {id:'QUIM0017-PX-PROD', department:'Eng. de Produção', name:'QUÍMICA GERAL TEÓRICA', turma:'PX', professor:'LUCIMAR PACHECO GOMES DA ROCHA', slots:[{dia:'QUA', horario:['08:00-09:00', '09:00-10:00'], sala:'SALA 10'}]},
+            {id:'PROD0077-PX', department:'Eng. de Produção', name:'SIMULAÇÃO DE SISTEMAS LOGÍSTICOS DE DISTRIBUIÇÃO', turma:'PX', professor:'EDSON TETSUO KOGACHI', slots:[{dia:'TER', horario:['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala:'SIMULAÇÃO E PRÁTICAS EMPRESARIAIS I'}]},
+            {id:'PROD0050-P7', department:'Eng. de Produção', name:'SIMULAÇÃO DOS PROCESSOS PRODUTIVOS', turma:'P7', professor:'EDSON TETSUO KOGACHI', slots:[{dia:'SEX', horario:['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'], sala:'SIMULAÇÃO E PRÁTICAS EMPRESARIAIS I'}]},
+            {id:'PROD0067-PX', department:'Eng. de Produção', name:'TFC - MONOGRAFIA', turma:'PX', professor:'GUNTHER JOSUÁ COSTA', slots:[{dia:'SAB', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 06'}]},
+            {id:'PROD0076-PX', department:'Eng. de Produção', name:'TÓPICOS ESPECIAIS EM PESQUISA OPERACIONAL', turma:'PX', professor:'FABIANA GOMES DOS PASSOS', slots:[{dia:'SEG', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 02'}, {dia:'QUA', horario:['14:00-15:00', '15:00-16:00'], sala:'SALA 02'}]}
         ];
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -244,6 +425,7 @@
             const darkModeToggle = document.getElementById('dark-mode-toggle');
             const lightIcon = document.getElementById('theme-toggle-light-icon');
             const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const scheduleLegend = document.getElementById('schedule-legend');
 
             // --- State ---
             let selectedCourseIdsSet = new Set();
@@ -315,7 +497,7 @@
                     checkbox.type = 'checkbox';
                     checkbox.id = course.id;
                     checkbox.value = course.id;
-                    checkbox.checked = selectedCourseIdsSet.has(course.id); // Set checked state from our Set
+                    checkbox.checked = selectedCourseIdsSet.has(course.id);
                     checkbox.classList.add('mt-1', 'h-4', 'w-4', 'rounded', 'border-gray-300', 'text-blue-600', 'focus:ring-blue-500', 'cursor-pointer');
                     
                     const label = document.createElement('label');
@@ -332,10 +514,11 @@
             const buildScheduleGrid = (courses) => {
                 scheduleGrid.innerHTML = '';
                 const days = ['HORÁRIO', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-                const times = [];
-                for (let i = 7; i <= 21; i++) {
-                    times.push(`${String(i).padStart(2, '0')}:00-${String(i+1).padStart(2, '0')}:00`);
-                }
+                const times = [
+                    '07:00-08:00', '08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00', '12:00-13:00',
+                    '13:00-14:00', '14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00',
+                    '18:00-18:50', '18:50-19:40', '19:40-20:30', '20:30-21:20', '21:20-22:10'
+                ];
 
                 const table = document.createElement('table');
                 table.className = 'w-full border-collapse text-center';
@@ -344,7 +527,7 @@
                 const headerRow = thead.insertRow();
                 days.forEach(day => {
                     const th = document.createElement('th');
-                    th.className = 'p-2 border border-gray-300 bg-gray-200 font-semibold text-sm sticky top-0 z-10';
+                    th.className = 'p-2 border border-gray-300 bg-gray-200 font-semibold text-xs sticky top-0 z-10';
                     th.textContent = day;
                     headerRow.appendChild(th);
                 });
@@ -360,53 +543,63 @@
                         const cell = row.insertCell();
                         cell.className = 'p-1 border border-gray-300 schedule-cell align-top';
                         cell.dataset.day = day;
-                        cell.dataset.time = time.split('-')[0];
+                        cell.dataset.time = time;
                     });
                 });
 
                 scheduleGrid.appendChild(table);
                 populateSchedule(courses);
             };
+            
+            const timeToMinutes = (timeStr) => {
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                return hours * 60 + minutes;
+            };
 
             const populateSchedule = (courses) => {
                 const occupiedSlots = {};
-
+                const courseColorMap = new Map();
                 courses.forEach((course, index) => {
-                    const color = colors[index % colors.length];
+                    courseColorMap.set(course.id, colors[index % colors.length]);
+                });
+
+                courses.forEach((course) => {
+                    const color = courseColorMap.get(course.id);
                     course.slots.forEach(slot => {
-                        const normalizedHours = slot.horario.flatMap(h => {
-                            const parts = h.split('-');
-                            if (parts.length !== 2) return [];
-                            const [startStr, endStr] = parts;
-                            const startHour = parseInt(startStr.split(':')[0]);
-                            const endHour = parseInt(endStr.split(':')[0]);
-                            if (isNaN(startHour) || isNaN(endHour)) return [];
-                            const hours = [];
-                            for (let i = startHour; i < endHour; i++) {
-                                hours.push(`${String(i).padStart(2, '0')}:00`);
-                            }
-                            return hours;
-                        });
+                        slot.horario.forEach(h => {
+                            const cells = scheduleGrid.querySelectorAll(`[data-day='${slot.dia}']`);
+                            cells.forEach(cell => {
+                                const cellTime = cell.dataset.time;
+                                 const [cellStartStr, cellEndStr] = cellTime.split('-');
+                                const [slotStartStr, slotEndStr] = h.split('-');
 
-                        normalizedHours.forEach(timeKey => {
-                            const cellId = `${slot.dia}-${timeKey}`;
-                            const cell = scheduleGrid.querySelector(`[data-day='${slot.dia}'][data-time='${timeKey}']`);
-                            
-                            if (cell) {
-                                if (!occupiedSlots[cellId]) {
-                                    occupiedSlots[cellId] = [];
+                                const cellStart = timeToMinutes(cellStartStr);
+                                const cellEnd = timeToMinutes(cellEndStr);
+                                const slotStart = timeToMinutes(slotStartStr);
+                                const slotEnd = timeToMinutes(slotEndStr);
+                                
+                                // Check for overlap
+                                if (Math.max(cellStart, slotStart) < Math.min(cellEnd, slotEnd)) {
+                                     const cellId = `${slot.dia}-${cellTime}`;
+                                     if (!occupiedSlots[cellId]) {
+                                        occupiedSlots[cellId] = [];
+                                    }
+                                    if(!occupiedSlots[cellId].includes(course.id)){
+                                       occupiedSlots[cellId].push(course.id);
+                                    }
+
+                                    const courseDiv = document.createElement('div');
+                                    courseDiv.classList.add(color, 'p-1', 'rounded-md', 'mb-1', 'course-item', 'text-left');
+                                    courseDiv.innerHTML = `
+                                        <p class="font-semibold">${course.name.substring(0,25)}${course.name.length > 25 ? '...' : ''}</p>
+                                        <p class="text-gray-700">${course.turma} - ${course.professor}</p>
+                                        <p class="text-gray-600 italic">Sala: ${slot.sala}</p>
+                                    `;
+                                    if(!cell.innerHTML.includes(course.name)) {
+                                       cell.appendChild(courseDiv);
+                                    }
                                 }
-                                occupiedSlots[cellId].push(course.id);
-
-                                const courseDiv = document.createElement('div');
-                                courseDiv.classList.add(color, 'p-1', 'rounded-md', 'mb-1', 'course-item', 'text-left');
-                                courseDiv.innerHTML = `
-                                    <p class="font-semibold">${course.name}</p>
-                                    <p class="text-gray-700">${course.turma} - ${course.professor}</p>
-                                    <p class="text-gray-600 italic">Sala: ${slot.sala}</p>
-                                `;
-                                cell.appendChild(courseDiv);
-                            }
+                            });
                         });
                     });
                 });
@@ -418,13 +611,43 @@
                         const cell = scheduleGrid.querySelector(`[data-day='${day}'][data-time='${time}']`);
                         if (cell) {
                             cell.classList.add('conflict');
-                            const conflictTitle = document.createElement('p');
-                            conflictTitle.className = "font-bold text-center text-white text-xs pb-1";
-                            conflictTitle.textContent = "CONFLITO!";
-                            cell.prepend(conflictTitle);
+                            if(!cell.innerHTML.includes("CONFLITO!")) {
+                                const conflictTitle = document.createElement('p');
+                                conflictTitle.className = "font-bold text-center text-white text-xs pb-1";
+                                conflictTitle.textContent = "CONFLITO!";
+                                cell.prepend(conflictTitle);
+                            }
                         }
                     }
                 }
+                buildScheduleLegend(courses, courseColorMap);
+            };
+
+            const buildScheduleLegend = (courses, colorMap) => {
+                scheduleLegend.innerHTML = '';
+                if (courses.length === 0) return;
+
+                const title = document.createElement('h3');
+                title.className = 'text-lg font-semibold mb-2 mt-4 border-t pt-4 border-gray-300';
+                title.textContent = 'Legenda das Disciplinas';
+                scheduleLegend.appendChild(title);
+
+                const list = document.createElement('div');
+                list.className = 'grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2';
+                
+                courses.sort((a,b) => a.name.localeCompare(b.name)).forEach(course => {
+                    const color = colorMap.get(course.id);
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center text-sm';
+                    item.innerHTML = `
+                        <span class="w-4 h-4 rounded-full mr-2 ${color}"></span>
+                        <span>
+                            <span class="font-semibold">${course.name}</span> (${course.turma}) - ${course.professor}
+                        </span>
+                    `;
+                    list.appendChild(item);
+                });
+                scheduleLegend.appendChild(list);
             };
 
             // --- Event Listeners ---
@@ -455,9 +678,12 @@
 
             clearBtn.addEventListener('click', () => {
                 scheduleGrid.innerHTML = '';
+                scheduleLegend.innerHTML = '';
                 scheduleGrid.classList.add('hidden');
                 schedulePlaceholder.classList.remove('hidden');
                 selectedCourseIdsSet.clear();
+                searchInput.value = '';
+                departmentFilter.value = 'Todos';
                 populateCourseList();
             });
 
