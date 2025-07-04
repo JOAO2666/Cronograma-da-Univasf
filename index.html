@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Montador de Cronograma de Aulas - Engenharias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .schedule-cell {
+            min-height: 80px;
+            transition: all 0.3s ease;
+        }
+        .conflict {
+            background-color: #ef4444 !important; /* red-500 */
+            color: white;
+            border: 2px solid #b91c1c; /* red-700 */
+        }
+        .course-item {
+            font-size: 11px;
+            line-height: 1.2;
+        }
+        /* Custom scrollbar for course list */
+        #course-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        #course-list::-webkit-scrollbar-track {
+            background: #f1f5f9; /* slate-100 */
+        }
+        #course-list::-webkit-scrollbar-thumb {
+            background-color: #94a3b8; /* slate-400 */
+            border-radius: 10px;
+            border: 2px solid #f1f5f9; /* slate-100 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Montador de Cronograma de Aulas</h1>
+            <p class="text-gray-600 mt-2">Filtre por curso, selecione suas disciplinas e gere seu horário personalizado.</p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+
+            <!-- Painel de Seleção de Disciplinas -->
+            <aside class="w-full lg:w-1/3 xl:w-1/4 bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 border-b pb-2">Disciplinas Disponíveis</h2>
+                
+                <!-- Filtro por Curso -->
+                <div class="mb-4">
+                    <label for="department-filter" class="block text-sm font-medium text-gray-700">Filtrar por Curso:</label>
+                    <select id="department-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <!-- Opções de filtro serão inseridas aqui -->
+                    </select>
+                </div>
+
+                <div id="course-list" class="space-y-3 max-h-[55vh] overflow-y-auto pr-2">
+                    <!-- A lista de disciplinas será inserida aqui -->
+                </div>
+                <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                    <button id="generate-schedule" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300">
+                        Gerar Horário
+                    </button>
+                     <button id="clear-schedule" class="w-full bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300">
+                        Limpar
+                    </button>
+                </div>
+                 <div class="mt-3">
+                    <button id="download-schedule" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300">
+                        Baixar Horário
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Painel do Cronograma -->
+            <main class="w-full lg:w-2/3 xl:w-3/4">
+                <div id="schedule-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg min-h-full">
+                     <div id="schedule-placeholder" class="text-center py-20 flex flex-col items-center justify-center h-full">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                          <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        <h3 class="mt-2 text-sm font-semibold text-gray-900">Nenhum horário gerado</h3>
+                        <p class="mt-1 text-sm text-gray-500">Selecione as disciplinas e clique em "Gerar Horário".</p>
+                      </div>
+                    <div id="schedule-grid" class="hidden">
+                        <!-- O cronograma será inserido aqui -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Dados consolidados de todos os PDFs
+        const allCoursesData = [
+            // Eng. de Computação
+            { id: 'ADMT0027-C6', department: 'Eng. de Computação', name: 'ADMINISTRAÇÃO PARA ENGENHARIA', turma: 'C6', professor: 'ANGELO ANTONIO MACEDO LEITE', slots: [{ dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA VIRTUAL 5' }] },
+            { id: 'CCMP0211-X1', department: 'Eng. de Computação', name: 'ALGORITMO E PROGRAMAÇÃO PARA COMPUTAÇÃO', turma: 'X1', professor: 'ANA EMILIA DE MELO QUEIROZ', slots: [{ dia: 'SEG', horario: ['13:00-14:00', '14:00-15:00'], sala: 'LAB PROG. BÁSICA' }, { dia: 'QUA', horario: ['13:00-14:00', '14:00-15:00'], sala: 'LAB PROG. BÁSICA' }] },
+            { id: 'CCMP0210-2C', department: 'Eng. de Computação', name: 'ALGORITMOS E ESTRUTURA DE DADOS', turma: '2C', professor: 'MARCELO SANTOS LINDER', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'LAB PROG. AVANÇADA' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'LAB PROG. AVANÇADA' }] },
+            { id: 'CCMP0210-C2', department: 'Eng. de Computação', name: 'ALGORITMOS E ESTRUTURA DE DADOS', turma: 'C2', professor: 'MARCELO SANTOS LINDER', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'LAB PROG. BÁSICA' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'LAB PROG. BÁSICA' }] },
+            { id: 'CCMP0058-C8', department: 'Eng. de Computação', name: 'ASPECTOS LEGAIS PARA COMPUTAÇÃO', turma: 'C8', professor: 'NÃO INFORMADO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 13' }] },
+            { id: 'CCMP0220-C6', department: 'Eng. de Computação', name: 'BANCO DE DADOS II', turma: 'C6', professor: 'MARIO GODOY NETO', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 18' }] },
+            { id: 'MATM0123-C4-COMP', department: 'Eng. de Computação', name: 'CÁLCULO NUMÉRICO', turma: 'C4', professor: 'JORGE LUIS CAVALCANTI RAMOS', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'NT 01' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'NT 01' }] },
+            { id: 'CCMP0234-C6', department: 'Eng. de Computação', name: 'ENGENHARIA DE SOFTWARE II', turma: 'C6', professor: 'RICARDO ARGENTON RAMOS', slots: [{ dia: 'SEX', horario: ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala: 'SALA 18' }] },
+            { id: 'CCMP0244-C6', department: 'Eng. de Computação', name: 'INTELIGÊNCIA ARTIFICIAL', turma: 'C6', professor: 'ROSALVO FERREIRA DE OLIVEIRA NETO', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA VIRTUAL 5' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA VIRTUAL 5' }] },
+            { id: 'CCMP0254-X1', department: 'Eng. de Computação', name: 'LÓGICA PARA COMPUTAÇÃO', turma: 'X1', professor: 'ROSALVO FERREIRA DE OLIVEIRA NETO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA VIRTUAL 2' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA VIRTUAL 2' }] },
+            { id: 'CCMP0255-X1', department: 'Eng. de Computação', name: 'MATEMÁTICA DISCRETA', turma: 'X1', professor: 'JORGE LUIS CAVALCANTI RAMOS', slots: [{ dia: 'TER', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA VIRTUAL 2' }, { dia: 'QUI', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA VIRTUAL 2' }] },
+            { id: 'CCMP0263-X3', department: 'Eng. de Computação', name: 'REDES DE COMPUTADORES', turma: 'X3', professor: 'NÃO INFORMADO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA VIRTUAL 6' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA VIRTUAL 6' }] },
+            { id: 'CCMP0078-CX', department: 'Eng. de Computação', name: 'TRABALHO DE CONCLUSÃO DE CURSO I', turma: 'CX', professor: 'RICARDO ARGENTON RAMOS', slots: [{ dia: 'SAB', horario: ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala: 'SALA 15' }] },
+            
+            // Eng. Agrícola e Ambiental
+            { id: 'AGR10088-A8', department: 'Eng. Agrícola e Ambiental', name: 'AGRONEGOCIO E ECONOMIA RURAL', turma: 'A8', professor: 'LUCIENE DO NASCIMENTO MENDES', slots: [{ dia: 'SEG', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 26' }, { dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 26' }] },
+            { id: 'AGR10087-A8', department: 'Eng. Agrícola e Ambiental', name: 'AVALIAÇÃO E PERÍCIAS DE IMÓVEIS RURAIS', turma: 'A8', professor: 'SILVIA HELENA NOGUEIRA TURCO', slots: [{ dia: 'TER', horario: ['13:00-14:00', '14:00-15:00', '15:00-16:00'], sala: 'SALA 21' }] },
+            { id: 'MATM0120-TX-AGR', department: 'Eng. Agrícola e Ambiental', name: 'CÁLCULO DIFERENCIAL E INTEGRAL II', turma: 'TX', professor: 'YSMAILYN SIQUEIRA COSTA', slots: [{ dia: 'SEG', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 11' }, { dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 11' }] },
+            { id: 'AGRI0036-A8', department: 'Eng. Agrícola e Ambiental', name: 'CONSTRUÇÕES RURAIS E AMBIÊNCIA', turma: 'A8', professor: 'SILVIA HELENA NOGUEIRA TURCO', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 26' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00', '12:00-13:00'], sala: 'SALA 26' }] },
+            { id: 'AGR10050-A8', department: 'Eng. Agrícola e Ambiental', name: 'DRENAGEM DE SOLOS AGRÍCOLAS', turma: 'A8', professor: 'CLOVIS MANOEL CARVALHO RAMOS', slots: [{ dia: 'TER', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 21' }, { dia: 'QUI', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 15' }] },
+            { id: 'AGR10043-A8', department: 'Eng. Agrícola e Ambiental', name: 'GESTÃO E LEGISLAÇÃO AMBIENTAL', turma: 'A8', professor: 'ΑΝΤΟΝΙΟ PEREIRA FILHO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 26' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 26' }] },
+
+            // Eng. Elétrica
+            { id: 'ADMT0027-E8', department: 'Eng. Elétrica', name: 'ADMINISTRAÇÃO PARA ENGENHARIA', turma: 'E8', professor: 'ANGELO ANTONIO MACEDO LEITE', slots: [{ dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 15' }] },
+            { id: 'MATM0118-E2', department: 'Eng. Elétrica', name: 'ÁLGEBRA LINEAR', turma: 'E2', professor: 'BETO ROBER BAUTISTA SAAVEDRA', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 8' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 8' }] },
+            { id: 'ELET0014-E4', department: 'Eng. Elétrica', name: 'CIRCUITOS ELÉTRICOS I', turma: 'E4', professor: 'RICARDO MENEZES PRATES', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 9' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 9' }] },
+            { id: 'ELET0034-E6', department: 'Eng. Elétrica', name: 'ELETROMAGNETISMO', turma: 'E6', professor: 'EDUARD MONTGOMERY MEIRA COSTA', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 14' }, { dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 14' }] },
+            { id: 'ECON0006-E8', department: 'Eng. Elétrica', name: 'ENGENHARIA ECONÔMICA', turma: 'E8', professor: 'RENNAN KERTLLY DE MEDEIROS', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 12' }, { dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 12' }] },
+            { id: 'ELET0051-E8', department: 'Eng. Elétrica', name: 'INSTALAÇÕES ELÉTRICAS', turma: 'E8', professor: 'RICARDO MENEZES PRATES', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 15' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 15' }] },
+            
+            // Eng. Mecânica
+            { id: 'MATM0118-M2', department: 'Eng. Mecânica', name: 'ÁLGEBRA LINEAR', turma: 'M2', professor: 'CARLOS ANTONIO FREITAS DA SILVA', slots: [{ dia: 'SEG', horario: ['08:00-09:00', '09:00-10:00'], sala: 'NT 01' }, { dia: 'QUA', horario: ['08:00-09:00', '09:00-10:00'], sala: 'NT 01' }] },
+            { id: 'MECN0045-M9', department: 'Eng. Mecânica', name: 'ECONOMIA PARA ENGENHARIA', turma: 'M9', professor: 'ALAN FRANCISCO CARVALHO PEREIRA', slots: [{ dia: 'SEX', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 24' }] },
+            { id: 'MECN0032-M7', department: 'Eng. Mecânica', name: 'ELEMENTOS DE MÁQUINAS II', turma: 'M7', professor: 'JOSE BISMARK DE MEDEIROS', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 23' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 23' }] },
+            { id: 'MECN0019-M5', department: 'Eng. Mecânica', name: 'MECÂNICA DOS FLUIDOS I', turma: 'M5', professor: 'EDNA SANTIAGO BENTA', slots: [{ dia: 'SEG', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 18' }, { dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 18' }] },
+            { id: 'MECN0020-M5', department: 'Eng. Mecânica', name: 'TERMODINAMICA BÁSICA', turma: 'M5', professor: 'LUIZ MARIANO PEREIRA', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'NT 02' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'NT 02' }] },
+
+            // Eng. Civil
+            { id: 'CIVL0042-18', department: 'Eng. Civil', name: 'ADMINISTRAÇÃO E CUSTOS DA CONSTRUÇÃO', turma: '18', professor: 'PAULO CÉSAR RODRIGUES DE LIMA JÚNIOR', slots: [{ dia: 'TER', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 05' }, { dia: 'QUI', horario: ['08:00-09:00', '09:00-10:00'], sala: 'SALA 05' }] },
+            { id: 'CIVL0032-16', department: 'Eng. Civil', name: 'ANÁLISE ESTRUTURAL I-ISOSTÁTICA', turma: '16', professor: 'JUDAS TADEU GOMES DE SOUSA', slots: [{ dia: 'QUA', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 04' }, { dia: 'SEX', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 04' }] },
+            { id: 'CIVL0047-18', department: 'Eng. Civil', name: 'ESTRUTURAS DE CONCRETO ARMADO II', turma: '18', professor: 'NAILDE DE AMORIM COELHO', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 05' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 05' }] },
+            { id: 'CIVL0065-TX', department: 'Eng. Civil', name: 'FUNDAÇÕES', turma: 'TX', professor: 'GERSON MARQUES DOS SANTOS', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 02' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 02' }] },
+            { id: 'CIVL0045-18', department: 'Eng. Civil', name: 'SANEAMENTO I', turma: '18', professor: 'SYLVIA PAES FARIAS DE OMENA', slots: [{ dia: 'SEX', horario: ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'], sala: 'SALA 05' }] },
+
+            // Eng. de Produção
+            { id: 'PROD0060-P9', department: 'Eng. de Produção', name: 'AGRONEGÓCIO', turma: 'P9', professor: 'JOSE LUIZ MOREIRA DE CARVALHO', slots: [{ dia: 'TER', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 8' }, { dia: 'QUI', horario: ['16:00-17:00', '17:00-18:00'], sala: 'SALA 06' }] },
+            { id: 'MATM0118-P2', department: 'Eng. de Produção', name: 'ALGEBRA LINEAR', turma: 'P2', professor: 'BETO ROBER BAUTISTA SAAVEDRA', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 14' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 14' }] },
+            { id: 'PROD0038-P5', department: 'Eng. de Produção', name: 'ANÁLISE DE INVESTIMENTOS', turma: 'P5', professor: 'ALAN FRANCISCO CARVALHO PEREIRA', slots: [{ dia: 'TER', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 04' }, { dia: 'QUI', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 9' }] },
+            { id: 'MATM0123-P5-PROD', department: 'Eng. de Produção', name: 'CÁLCULO NUMÉRICO', turma: 'P5', professor: 'SERGIO FLOQUET SALES', slots: [{ dia: 'TER', horario: ['16:00-17:00', '17:00-18:00'], sala: 'NT 02' }, { dia: 'QUI', horario: ['16:00-17:00', '17:00-18:00'], sala: 'NT 02' }] },
+            { id: 'PROD0052-P7', department: 'Eng. de Produção', name: 'ENGENHARIA DO PRODUTO', turma: 'P7', professor: 'GUNTHER JOSUA COSTA', slots: [{ dia: 'SEG', horario: ['16:00-17:00', '17:00-18:00'], sala: 'NT 01' }, { dia: 'QUA', horario: ['16:00-17:00', '17:00-18:00'], sala: 'NT 01' }] },
+            { id: 'PROD0053-P7', department: 'Eng. de Produção', name: 'GESTÃO DE SERVIÇOS', turma: 'P7', professor: 'ANA CRISTINA GONÇALVES CASTRO SILVA', slots: [{ dia: 'TER', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 28' }, { dia: 'QUI', horario: ['10:00-11:00', '11:00-12:00'], sala: 'SALA 28' }] },
+            { id: 'PROD0039-P5', department: 'Eng. de Produção', name: 'PESQUISA OPERACIONAL I', turma: 'P5', professor: 'ANTONIO PIRES CRISOSTOMO', slots: [{ dia: 'SEG', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 06' }, { dia: 'QUA', horario: ['14:00-15:00', '15:00-16:00'], sala: 'SALA 06' }] },
+        ];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const courseList = document.getElementById('course-list');
+            const departmentFilter = document.getElementById('department-filter');
+            const generateBtn = document.getElementById('generate-schedule');
+            const downloadBtn = document.getElementById('download-schedule');
+            const clearBtn = document.getElementById('clear-schedule');
+            const scheduleGrid = document.getElementById('schedule-grid');
+            const scheduleContainer = document.getElementById('schedule-container');
+            const schedulePlaceholder = document.getElementById('schedule-placeholder');
+
+            const colors = [
+                'bg-blue-200', 'bg-green-200', 'bg-yellow-200', 'bg-pink-200', 'bg-purple-200',
+                'bg-indigo-200', 'bg-red-200', 'bg-teal-200', 'bg-orange-200', 'bg-cyan-200',
+                'bg-blue-300', 'bg-green-300', 'bg-yellow-300', 'bg-pink-300', 'bg-purple-300'
+            ];
+
+            const departments = ['Todos', ...new Set(allCoursesData.map(c => c.department))];
+
+            // Popula o filtro de cursos
+            departments.forEach(dep => {
+                const option = document.createElement('option');
+                option.value = dep;
+                option.textContent = dep;
+                departmentFilter.appendChild(option);
+            });
+
+            // Função para popular a lista de disciplinas com base no filtro
+            const populateCourseList = (filter = 'Todos') => {
+                courseList.innerHTML = '';
+                const filteredData = (filter === 'Todos') 
+                    ? allCoursesData 
+                    : allCoursesData.filter(c => c.department === filter);
+                
+                filteredData.sort((a, b) => a.name.localeCompare(b.name));
+
+                filteredData.forEach(course => {
+                    const div = document.createElement('div');
+                    div.classList.add('flex', 'items-start', 'bg-gray-50', 'p-2', 'rounded-lg', 'hover:bg-gray-200');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = course.id;
+                    checkbox.value = course.id;
+                    checkbox.classList.add('mt-1', 'h-4', 'w-4', 'rounded', 'border-gray-300', 'text-blue-600', 'focus:ring-blue-500', 'cursor-pointer');
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = course.id;
+                    label.classList.add('ml-3', 'block', 'text-sm', 'font-medium', 'text-gray-700', 'cursor-pointer', 'w-full');
+                    label.innerHTML = `${course.name} <span class="text-xs text-gray-500 block">(Turma: ${course.turma})</span><span class="text-xs text-gray-500 block">${course.professor}</span>`;
+
+                    div.appendChild(checkbox);
+                    div.appendChild(label);
+                    courseList.appendChild(div);
+                });
+            };
+
+            // Event listener para o filtro
+            departmentFilter.addEventListener('change', (e) => {
+                populateCourseList(e.target.value);
+            });
+
+            // Geração do Cronograma
+            generateBtn.addEventListener('click', () => {
+                const selectedCoursesIds = Array.from(courseList.querySelectorAll('input[type=checkbox]:checked'))
+                                                .map(cb => cb.value);
+                
+                if (selectedCoursesIds.length === 0) {
+                    alert("Por favor, selecione pelo menos uma disciplina.");
+                    return;
+                }
+
+                const selectedCourses = allCoursesData.filter(c => selectedCoursesIds.includes(c.id));
+                
+                buildScheduleGrid(selectedCourses);
+                schedulePlaceholder.classList.add('hidden');
+                scheduleGrid.classList.remove('hidden');
+            });
+
+            // Limpeza do Cronograma
+            clearBtn.addEventListener('click', () => {
+                scheduleGrid.innerHTML = '';
+                scheduleGrid.classList.add('hidden');
+                schedulePlaceholder.classList.remove('hidden');
+                Array.from(document.querySelectorAll('#course-list input[type=checkbox]:checked')).forEach(cb => cb.checked = false);
+            });
+
+            // Download do Cronograma
+            downloadBtn.addEventListener('click', () => {
+                if (scheduleGrid.classList.contains('hidden')) {
+                    alert("Gere um horário antes de tentar baixar.");
+                    return;
+                }
+                html2canvas(scheduleContainer, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'meu-horario-2025.2.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            });
+
+            const buildScheduleGrid = (courses) => {
+                scheduleGrid.innerHTML = '';
+                const days = ['HORÁRIO', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+                const times = [];
+                for (let i = 7; i <= 21; i++) {
+                    times.push(`${String(i).padStart(2, '0')}:00-${String(i+1).padStart(2, '0')}:00`);
+                }
+
+                const table = document.createElement('table');
+                table.className = 'w-full border-collapse text-center';
+
+                const thead = table.createTHead();
+                const headerRow = thead.insertRow();
+                days.forEach(day => {
+                    const th = document.createElement('th');
+                    th.className = 'p-2 border border-gray-300 bg-gray-200 font-semibold text-sm sticky top-0 z-10';
+                    th.textContent = day;
+                    headerRow.appendChild(th);
+                });
+
+                const tbody = table.createTBody();
+                times.forEach(time => {
+                    const row = tbody.insertRow();
+                    const timeCell = row.insertCell();
+                    timeCell.className = 'p-2 border border-gray-300 bg-gray-100 font-semibold text-xs whitespace-pre-line';
+                    timeCell.textContent = time.replace('-', '\n');
+                    
+                    days.slice(1).forEach(day => {
+                        const cell = row.insertCell();
+                        cell.className = 'p-1 border border-gray-300 schedule-cell align-top';
+                        cell.dataset.day = day;
+                        cell.dataset.time = time.split('-')[0];
+                    });
+                });
+
+                scheduleGrid.appendChild(table);
+                populateSchedule(courses);
+            };
+
+            const populateSchedule = (courses) => {
+                const occupiedSlots = {};
+
+                courses.forEach((course, index) => {
+                    const color = colors[index % colors.length];
+                    course.slots.forEach(slot => {
+                        // Normaliza o horário para blocos de 1 hora
+                        const normalizedHours = slot.horario.flatMap(h => {
+                            const [startStr, endStr] = h.split('-');
+                            const startHour = parseInt(startStr.split(':')[0]);
+                            const endHour = parseInt(endStr.split(':')[0]);
+                            const hours = [];
+                            for (let i = startHour; i < endHour; i++) {
+                                hours.push(`${String(i).padStart(2, '0')}:00`);
+                            }
+                            return hours;
+                        });
+
+                        normalizedHours.forEach(timeKey => {
+                            const cellId = `${slot.dia}-${timeKey}`;
+                            const cell = scheduleGrid.querySelector(`[data-day='${slot.dia}'][data-time='${timeKey}']`);
+                            
+                            if (cell) {
+                                if (!occupiedSlots[cellId]) {
+                                    occupiedSlots[cellId] = [];
+                                }
+                                occupiedSlots[cellId].push(course.id);
+
+                                const courseDiv = document.createElement('div');
+                                courseDiv.classList.add(color, 'p-1', 'rounded-md', 'mb-1', 'course-item', 'text-left');
+                                courseDiv.innerHTML = `
+                                    <p class="font-semibold">${course.name}</p>
+                                    <p class="text-gray-700">${course.turma} - ${course.professor}</p>
+                                    <p class="text-gray-600 italic">Sala: ${slot.sala}</p>
+                                `;
+                                cell.appendChild(courseDiv);
+                            }
+                        });
+                    });
+                });
+
+                // Verifica conflitos
+                for (const slotId in occupiedSlots) {
+                    if (occupiedSlots[slotId].length > 1) {
+                        const [day, time] = slotId.split('-');
+                        const cell = scheduleGrid.querySelector(`[data-day='${day}'][data-time='${time}']`);
+                        if (cell) {
+                            cell.classList.add('conflict');
+                            const conflictTitle = document.createElement('p');
+                            conflictTitle.className = "font-bold text-center text-white text-xs pb-1";
+                            conflictTitle.textContent = "CONFLITO!";
+                            cell.prepend(conflictTitle);
+                        }
+                    }
+                }
+            };
+
+            // Inicializa a lista de disciplinas
+            populateCourseList();
+        });
+    </script>
+
+</body>
+</html>
