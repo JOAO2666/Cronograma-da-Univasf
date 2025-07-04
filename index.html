@@ -67,7 +67,8 @@
         }
         html.dark #course-list::-webkit-scrollbar-track { background: #1e293b; }
         html.dark #course-list::-webkit-scrollbar-thumb { background-color: #475569; border-color: #1e293b; }
-        html.dark .schedule-cell .course-item p { color: #1e293b; /* slate-800 */ }
+        html.dark .course-item p { color: #1e293b; /* slate-800 */ }
+        html.dark .course-item .italic { color: #334155 !important; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -229,6 +230,7 @@
         ];
         
         document.addEventListener('DOMContentLoaded', () => {
+            // --- Elements ---
             const courseList = document.getElementById('course-list');
             const departmentFilter = document.getElementById('department-filter');
             const searchInput = document.getElementById('search-input');
@@ -243,7 +245,10 @@
             const lightIcon = document.getElementById('theme-toggle-light-icon');
             const darkIcon = document.getElementById('theme-toggle-dark-icon');
 
-            // Dark Mode Logic
+            // --- State ---
+            let selectedCourseIdsSet = new Set();
+
+            // --- Dark Mode Logic ---
             const applyTheme = (theme) => {
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
@@ -265,29 +270,29 @@
                 applyTheme(newTheme);
             });
 
+            // --- Data & Colors ---
             const colors = [
                 'bg-blue-200', 'bg-green-200', 'bg-yellow-200', 'bg-pink-200', 'bg-purple-200',
                 'bg-indigo-200', 'bg-red-200', 'bg-teal-200', 'bg-orange-200', 'bg-cyan-200',
                 'bg-blue-300', 'bg-green-300', 'bg-yellow-300', 'bg-pink-300', 'bg-purple-300'
             ];
-
             const departments = ['Todos', ...new Set(allCoursesData.map(c => c.department))].sort();
 
-            // Popula o filtro de cursos
-            departments.forEach(dep => {
-                const option = document.createElement('option');
-                option.value = dep;
-                option.textContent = dep;
-                departmentFilter.appendChild(option);
-            });
+            // --- Functions ---
+            const populateDepartmentFilter = () => {
+                departments.forEach(dep => {
+                    const option = document.createElement('option');
+                    option.value = dep;
+                    option.textContent = dep;
+                    departmentFilter.appendChild(option);
+                });
+            };
 
-            // Função para popular a lista de disciplinas com base nos filtros
             const populateCourseList = () => {
                 const department = departmentFilter.value;
                 const searchTerm = searchInput.value.toLowerCase();
                 
                 courseList.innerHTML = '';
-
                 let dataToDisplay = allCoursesData;
 
                 if (department !== 'Todos') {
@@ -310,6 +315,7 @@
                     checkbox.type = 'checkbox';
                     checkbox.id = course.id;
                     checkbox.value = course.id;
+                    checkbox.checked = selectedCourseIdsSet.has(course.id); // Set checked state from our Set
                     checkbox.classList.add('mt-1', 'h-4', 'w-4', 'rounded', 'border-gray-300', 'text-blue-600', 'focus:ring-blue-500', 'cursor-pointer');
                     
                     const label = document.createElement('label');
@@ -322,70 +328,6 @@
                     courseList.appendChild(div);
                 });
             };
-
-            // Event listeners para os filtros
-            departmentFilter.addEventListener('change', populateCourseList);
-            searchInput.addEventListener('input', populateCourseList);
-
-            // Geração do Cronograma
-            generateBtn.addEventListener('click', () => {
-                const selectedCoursesIds = Array.from(document.querySelectorAll('#course-list input[type=checkbox]:checked'))
-                                                .map(cb => cb.value);
-                
-                if (selectedCoursesIds.length === 0) {
-                    alert("Por favor, selecione pelo menos uma disciplina.");
-                    return;
-                }
-
-                const selectedCourses = allCoursesData.filter(c => selectedCoursesIds.includes(c.id));
-                
-                buildScheduleGrid(selectedCourses);
-                schedulePlaceholder.classList.add('hidden');
-                scheduleGrid.classList.remove('hidden');
-            });
-
-            // Limpeza do Cronograma
-            clearBtn.addEventListener('click', () => {
-                scheduleGrid.innerHTML = '';
-                scheduleGrid.classList.add('hidden');
-                schedulePlaceholder.classList.remove('hidden');
-                Array.from(document.querySelectorAll('#course-list input[type=checkbox]:checked')).forEach(cb => cb.checked = false);
-            });
-
-            // Download como PNG
-            downloadPngBtn.addEventListener('click', () => {
-                if (scheduleGrid.classList.contains('hidden')) {
-                    alert("Gere um horário antes de tentar baixar.");
-                    return;
-                }
-                html2canvas(scheduleContainer, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = 'meu-horario.png';
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                });
-            });
-            
-            // Download como PDF
-            downloadPdfBtn.addEventListener('click', () => {
-                if (scheduleGrid.classList.contains('hidden')) {
-                    alert("Gere um horário antes de tentar baixar.");
-                    return;
-                }
-                const { jsPDF } = window.jspdf;
-                
-                html2canvas(scheduleContainer, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jsPDF({
-                        orientation: 'landscape',
-                        unit: 'px',
-                        format: [canvas.width, canvas.height]
-                    });
-                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-                    pdf.save('meu-horario.pdf');
-                });
-            });
-
 
             const buildScheduleGrid = (courses) => {
                 scheduleGrid.innerHTML = '';
@@ -469,7 +411,7 @@
                     });
                 });
 
-                // Verifica conflitos
+                // Check for conflicts
                 for (const slotId in occupiedSlots) {
                     if (occupiedSlots[slotId].length > 1) {
                         const [day, time] = slotId.split('-');
@@ -485,7 +427,74 @@
                 }
             };
 
-            // Inicializa a lista de disciplinas
+            // --- Event Listeners ---
+            departmentFilter.addEventListener('change', populateCourseList);
+            searchInput.addEventListener('input', populateCourseList);
+            
+            courseList.addEventListener('change', (e) => {
+                if (e.target.type === 'checkbox') {
+                    const courseId = e.target.value;
+                    if (e.target.checked) {
+                        selectedCourseIdsSet.add(courseId);
+                    } else {
+                        selectedCourseIdsSet.delete(courseId);
+                    }
+                }
+            });
+
+            generateBtn.addEventListener('click', () => {
+                if (selectedCourseIdsSet.size === 0) {
+                    alert("Por favor, selecione pelo menos uma disciplina.");
+                    return;
+                }
+                const selectedCourses = allCoursesData.filter(c => selectedCourseIdsSet.has(c.id));
+                buildScheduleGrid(selectedCourses);
+                schedulePlaceholder.classList.add('hidden');
+                scheduleGrid.classList.remove('hidden');
+            });
+
+            clearBtn.addEventListener('click', () => {
+                scheduleGrid.innerHTML = '';
+                scheduleGrid.classList.add('hidden');
+                schedulePlaceholder.classList.remove('hidden');
+                selectedCourseIdsSet.clear();
+                populateCourseList();
+            });
+
+            downloadPngBtn.addEventListener('click', () => {
+                if (scheduleGrid.classList.contains('hidden')) {
+                    alert("Gere um horário antes de tentar baixar.");
+                    return;
+                }
+                html2canvas(scheduleContainer, { scale: 2, backgroundColor: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff' }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'meu-horario.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            });
+            
+            downloadPdfBtn.addEventListener('click', () => {
+                if (scheduleGrid.classList.contains('hidden')) {
+                    alert("Gere um horário antes de tentar baixar.");
+                    return;
+                }
+                const { jsPDF } = window.jspdf;
+                
+                html2canvas(scheduleContainer, { scale: 2, backgroundColor: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff' }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'px',
+                        format: [canvas.width, canvas.height]
+                    });
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                    pdf.save('meu-horario.pdf');
+                });
+            });
+
+            // --- Initial Load ---
+            populateDepartmentFilter();
             populateCourseList();
         });
     </script>
