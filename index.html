@@ -6,6 +6,7 @@
     <title>Montador de Cronograma de Aulas - Engenharias</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -62,7 +63,7 @@
                     </select>
                 </div>
 
-                <div id="course-list" class="space-y-3 max-h-[55vh] overflow-y-auto pr-2">
+                <div id="course-list" class="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
                     <!-- A lista de disciplinas será inserida aqui -->
                 </div>
                 <div class="mt-6 flex flex-col sm:flex-row gap-3">
@@ -73,9 +74,12 @@
                         Limpar
                     </button>
                 </div>
-                 <div class="mt-3">
-                    <button id="download-schedule" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300">
-                        Baixar Horário
+                 <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button id="download-png" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300">
+                        Baixar Imagem (PNG)
+                    </button>
+                    <button id="download-pdf" class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-300">
+                        Baixar PDF
                     </button>
                 </div>
             </aside>
@@ -189,7 +193,8 @@
             const courseList = document.getElementById('course-list');
             const departmentFilter = document.getElementById('department-filter');
             const generateBtn = document.getElementById('generate-schedule');
-            const downloadBtn = document.getElementById('download-schedule');
+            const downloadPngBtn = document.getElementById('download-png');
+            const downloadPdfBtn = document.getElementById('download-pdf');
             const clearBtn = document.getElementById('clear-schedule');
             const scheduleGrid = document.getElementById('schedule-grid');
             const scheduleContainer = document.getElementById('schedule-container');
@@ -270,19 +275,40 @@
                 Array.from(document.querySelectorAll('#course-list input[type=checkbox]:checked')).forEach(cb => cb.checked = false);
             });
 
-            // Download do Cronograma
-            downloadBtn.addEventListener('click', () => {
+            // Download como PNG
+            downloadPngBtn.addEventListener('click', () => {
                 if (scheduleGrid.classList.contains('hidden')) {
                     alert("Gere um horário antes de tentar baixar.");
                     return;
                 }
                 html2canvas(scheduleContainer, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
                     const link = document.createElement('a');
-                    link.download = 'meu-horario-2025.2.png';
+                    link.download = 'meu-horario.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                 });
             });
+            
+            // Download como PDF
+            downloadPdfBtn.addEventListener('click', () => {
+                if (scheduleGrid.classList.contains('hidden')) {
+                    alert("Gere um horário antes de tentar baixar.");
+                    return;
+                }
+                const { jsPDF } = window.jspdf;
+                
+                html2canvas(scheduleContainer, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'px',
+                        format: [canvas.width, canvas.height]
+                    });
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                    pdf.save('meu-horario.pdf');
+                });
+            });
+
 
             const buildScheduleGrid = (courses) => {
                 scheduleGrid.innerHTML = '';
