@@ -2,7 +2,9 @@
 
 Este projeto contém os horários e cronogramas de disciplinas da Universidade Federal do Vale do São Francisco (Univasf).
 
-O site com o cronograma pode ser acessado através do link abaixo (será adicionado em breve).
+O site com o cronograma pode ser acessado através do link abaixo:
+
+🌐 **[Acesse o Cronograma Online](https://joao2666.github.io/Cronograma-da-Univasf/)**
 
 ## Arquivos
 
